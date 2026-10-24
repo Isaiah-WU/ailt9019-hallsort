@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-25T00:58:02.531313+08:00",
+  "provider": "Alibaba Cloud Bailian",
+  "model": "qwen3.8-flash",
+  "planned": 2,
+  "completed": 2,
+  "passed": 2,
+  "note": "AI-authored small acceptance suite, expected results fixed before running. Not independent team validation or broad accuracy.",
+  "source_hashes": {
+    "main.py": "6518f4eff73a7e8d957261b48e11b0b93888a7f14888438b130b6f538706c5d3",
+    "rules.json": "401442f74f06bae8af181a01c1680703877c92713e787698c8832690ea7ef02e",
+    "tests/live_cases.json": "acb9f53438fe575b16c7c34156975151f25c57754a60a98be6a8710e7b3ac297"
+  },
+  "cases": [
+    {
+      "id": "L17",
+      "query": "A clean takeaway paper coffee cup with a clean plastic lid and a dry paper sleeve.",
+      "status": "classified",
+      "rule_ids": [
+        "R08",
+        "R09",
+        "R10"
+      ],
+      "passed": true,
+      "seconds": 8.03,
+      "actual": {
+        "status": "classified",
+        "mode": "llm",
+        "message": "Check each part and the collection point before disposal.",
+        "parts": [
+          {
+            "part": "clean takeaway paper coffee cup",
+            "bin": "Beverage Cartons",
+            "rule_id": "R10",
+            "returned_rule_id": "R10",
+            "reason": "A clean takeaway paper coffee cup uses the Tetra Pak collection stream.",
+            "source": "https://www.wastereduction.hku.hk/photo-guide",
+            "source_title": "HKU Photo Guide"
+          },
+          {
+            "part": "clean coffee cup lid",
+            "bin": "Plastic",
+            "rule_id": "R08",
+            "returned_rule_id": "R8",
+            "reason": "The clean lid of a takeaway coffee cup belongs in plastic recycling.",
+            "source": "https://www.wastereduction.hku.hk/photo-guide",
+            "source_title": "HKU Photo Guide"
+          },
+          {
+            "part": "coffee cup sleeve",
+            "bin": "Paper",
+            "rule_id": "R09",
+            "returned_rule_id": "R9",
+            "reason": "A takeaway coffee cup sleeve belongs in paper recycling.",
+            "source": "https://www.wastereduction.hku.hk/photo-guide",
+            "source_title": "HKU Photo Guide"
+          }
+        ],
+        "notice": "Educational prototype. These rules describe HKU re Kiosk, not every hall bin. Posted signage and staff instructions take precedence.",
+        "rule_version": "2026-10-25.1"
+      }
+    },
+    {
+      "id": "L32",
+      "query": "An unidentified object attached to some dry office paper.",
+      "status": "refused",
+      "rule_ids": [],
+      "passed": true,
+      "seconds": 6.42,
+      "actual": {
+        "status": "refused",
+        "mode": "llm",
+        "message": "I cannot classify this item using the verified HKU rules.",
+        "parts": [],
+        "notice": "Educational prototype. These rules describe HKU re Kiosk, not every hall bin. Posted signage and staff instructions take precedence.",
+        "rule_version": "2026-10-25.1"
+      }
+    }
+  ]
+}

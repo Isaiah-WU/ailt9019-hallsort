@@ -1,0 +1,11 @@
+Verified 25 October 2026 (Hong Kong time)
+Provider: Alibaba Cloud Bailian; model: qwen3.8-flash.
+30/32 live acceptance cases; 19/20 classification and 11/12 refusal cases.
+Targeted rerun after rule-ID normalization: 2/2; full suite not rerun.
+20 unit/contract tests passed; 36 curated catalog cases passed.
+Refusal counts include local guards, not only model responses.
+Tests are AI-authored, small acceptance checks, not independent team validation.
+See complete expected/actual results and hashes in the JSON evidence files.
+API calls were serial; no keys are included in this package.
+Browser screenshots show both catalog and real-model outputs.
+One dependency deprecation warning was observed; no test failures resulted.

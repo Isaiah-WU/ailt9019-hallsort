@@ -83,7 +83,7 @@ Known limits:
 
 ## Midterm handoff
 
-The course requires a <=60-second MP4, `repository_link.txt` and the one-page status sheet inside a ZIP <=100 MB. A 38-second demo has been recorded and is ready for the ZIP; it is not stored in this repository. Repository: https://github.com/Isaiah-WU/ailt9019-hallsort (private). Course-team access still needs to be granted and verified. Uploading this source archive alone does not satisfy the submission requirement.
+The course requires a <=60-second MP4, `repository_link.txt` and the one-page status sheet inside a ZIP <=100 MB. A 38-second 1080p demo has been recorded and is ready for the ZIP; it is not stored in this repository. Repository: https://github.com/Isaiah-WU/ailt9019-hallsort (private). Course-team access still needs to be granted and verified. Uploading this source archive alone does not satisfy the submission requirement.
 
 The user reported no prior implementation work and subsequently supplied the group API credentials and setup information. No other member's completed contribution has been confirmed. Each member should complete a specific review, test, documentation or implementation task and record it accurately before finalizing the status sheet. No Moodle submission has been made.
 

@@ -10,7 +10,7 @@ This record covers what was actually executed on this machine. Nothing below is 
 
 | Item | Value |
 |---|---|
-| Commit | `02d7c8a` (`main`, `origin/main`) |
+| Commit | `02d7c8a`, then re-verified on `0ca427a` after the frontend merge |
 | OS | macOS 27.0.1, build 26A434, arm64 |
 | Python A | 3.12.13 (pyenv), new virtual environment |
 | Python B | 3.13.12, separate virtual environment |
@@ -68,6 +68,8 @@ Results:
 | `pytest` on Python 3.13.12 with `requirements-lock.txt` | `20 passed, 1 warning in 0.28s` |
 | `evaluate.py` | `Catalog regression: 36/36 passed. Live LLM: not tested.` exit code 0 |
 
+Re-verified after PR #1 merged a frontend rewrite (`0ca427a`): 20/20 still passes. The merge touched only `static/app.js`, `static/index.html` and `static/style.css`, so the API, the rule catalog and the recorded hashes are unchanged. The demo video was re-recorded against that commit because the form gained a character counter and a Clear button.
+
 The single warning is `StarletteDeprecationWarning: Using httpx with starlette.testclient is deprecated`. It is the same warning recorded in `evidence/unit_tests.txt` and does not affect any result.
 
 The rerun reproduces the committed record exactly:
@@ -121,8 +123,9 @@ Severity is about what a marker or TA would hit, not about code quality.
 | D11 | Low | `start.ps1` installs dependencies only when `.venv\Scripts\python.exe` is absent. A venv left behind by a failed `pip install`, or one created before a dependency change, is reused without reinstalling and the server then fails with `ModuleNotFoundError`. Not observed on Windows, inferred from the script. | Reinstall when `requirements.txt` is newer than the venv, or always run `pip install` (it is idempotent). |
 | D12 | Low (UX honesty) | In AI mode, `static/app.js` labels every result "AI INTERPRETATION", including refusals produced by the local `guard()` before any model call. A hazardous-item refusal therefore looks like a model output when no request was made. Observed in the demo recording. | Return a `model_called` flag from the server and label from that, or use a third label such as "LOCAL SCREEN". |
 | D13 | Medium (reliability) | Between 20:00 and 20:30 HKT on 25 October the same request that had averaged 3.5 s over 32 cases at 18:00 began exceeding the app's 25 s timeout, about one call in two, surfacing to the user as "This mode is unavailable." The endpoint was healthy at the same time: a minimal request returned in 1.4 s and the app's exact payload returned in 4.6 s when called directly with curl. | The delay is upstream queueing, not a code defect, but a 25 s timeout makes a user-visible failure likely under load. Raise the timeout, add one retry, or state the risk in the limits section. |
+| D14 | Low | The frontend merge (`0ca427a`) added a `0 / 400 characters` counter under the textarea but no code updates it, so it reads zero while the field is full. Observed in the re-recorded demo. | Fixed in this branch: `app.js` now updates the counter on input and on load. Verified 0, 65, 0 across type and clear. |
 
-D1 to D6 and D10 were corrected in `README.md` in the same commit as this record, and the `start.ps1` version message was aligned with D3. D7, D8, D9, D11, D12 and D13 are recorded only.
+D1 to D6 and D10 were corrected in `README.md` in the same commit as this record, and the `start.ps1` version message was aligned with D3. D14 is fixed in `static/app.js`. D7, D8, D9, D11, D12 and D13 are recorded only.
 
 ## 7. What this check does and does not establish
 

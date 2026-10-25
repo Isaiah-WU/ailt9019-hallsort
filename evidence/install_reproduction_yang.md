@@ -103,7 +103,7 @@ Severity is about what a marker or TA would hit, not about code quality.
 |---|---|---|---|
 | D1 | Medium | Setup and verify commands are PowerShell only. On a stock macOS there is no `python` on `PATH`, so the first documented command fails. `start.ps1` has no POSIX equivalent. | Dual-platform command blocks; name `python3` for macOS. A `start.sh` is optional. |
 | D2 | Medium | `requirements-lock.txt` exists but the README never mentions it, so a reader installs unpinned transitive dependencies. | Document `-r requirements-lock.txt` as the exact-reproduction path. |
-| D3 | Low | README states Python 3.12 only. 3.13.12 also passes 20/20. | State 3.12 and 3.13 as verified. |
+| D3 | Low | README states Python 3.12 only. 3.13.12 also passes 20/20. The same stale version appears in a `start.ps1` error message. | State 3.12 and 3.13 as verified, and align the launcher message. |
 | D4 | High (accuracy) | README and the group summary attribute both live-test failures to the rule-ID fix. The evidence supports that for L17 only; L32 passed on a different model response. Both were `unavailable`, not misclassifications. | Reword to what the evidence shows, and state that the 32-case pass rate after the fix is unmeasured. |
 | D5 | Low | README says the live script "stops after two unavailable responses"; the counter resets after each successful call, so it stops after two consecutive ones. | Add "consecutive". |
 | D6 | Low | The live-test section says `python evaluate_live.py --run`, but the dependencies live in `.venv`, and the script hardcodes `127.0.0.1:8019` without the README saying the server must listen there. | Use the venv interpreter and state the fixed address. |
@@ -111,8 +111,9 @@ Severity is about what a marker or TA would hit, not about code quality.
 | D8 | Low | `evidence/unit_tests.txt` is the only test log and contains the author's local path `C:\Users\hanli\...`. | Add a macOS log; the path is a minor local-path disclosure. |
 | D9 | Low | `httpx` honours `HTTP_PROXY`. On a machine with proxy environment variables set, calls to `127.0.0.1` are proxied and `evaluate_live.py` fails with connection errors. Reproduced here. | Document `NO_PROXY=127.0.0.1`, or pass `trust_env=False` in the client. |
 | D10 | Medium (accuracy) | The verify section lists "multipart limits" among the tested behaviours. The API accepts JSON only; `main.py` has no multipart handling and `tests/test_contracts.py` has no multipart case. | Remove the claim, or add a real test. |
+| D11 | Low | `start.ps1` installs dependencies only when `.venv\Scripts\python.exe` is absent. A venv left behind by a failed `pip install`, or one created before a dependency change, is reused without reinstalling and the server then fails with `ModuleNotFoundError`. Not observed on Windows, inferred from the script. | Reinstall when `requirements.txt` is newer than the venv, or always run `pip install` (it is idempotent). |
 
-D1 to D6 and D10 were corrected in `README.md` in the same commit as this record. D7 to D9 are recorded only.
+D1 to D6 and D10 were corrected in `README.md` in the same commit as this record, and the `start.ps1` version message was aligned with D3. D7, D8, D9 and D11 are recorded only.
 
 ## 7. What this check does and does not establish
 
@@ -125,6 +126,7 @@ Establishes:
 
 Does not establish:
 
+- That the documented steps work on Windows. Only macOS was tested here. `start.ps1` was reviewed by reading it, not by running it, and no Windows machine was available.
 - That AI mode works. The key is withheld; the claim rests on the author's recorded run.
 - That the rules match current HKU signage. Not checked here.
 - That 19/20 and 11/12 measure model accuracy. The suite is AI-authored and small, as the README already says.

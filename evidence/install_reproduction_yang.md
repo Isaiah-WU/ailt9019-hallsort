@@ -117,8 +117,9 @@ Severity is about what a marker or TA would hit, not about code quality.
 | D9 | Low | `httpx` honours `HTTP_PROXY`. On a machine with proxy environment variables set, calls to `127.0.0.1` are proxied and `evaluate_live.py` fails with connection errors. Reproduced here. | Document `NO_PROXY=127.0.0.1`, or pass `trust_env=False` in the client. |
 | D10 | Medium (accuracy) | The verify section lists "multipart limits" among the tested behaviours. The API accepts JSON only; `main.py` has no multipart handling and `tests/test_contracts.py` has no multipart case. | Remove the claim, or add a real test. |
 | D11 | Low | `start.ps1` installs dependencies only when `.venv\Scripts\python.exe` is absent. A venv left behind by a failed `pip install`, or one created before a dependency change, is reused without reinstalling and the server then fails with `ModuleNotFoundError`. Not observed on Windows, inferred from the script. | Reinstall when `requirements.txt` is newer than the venv, or always run `pip install` (it is idempotent). |
+| D12 | Low (UX honesty) | In AI mode, `static/app.js` labels every result "AI INTERPRETATION", including refusals produced by the local `guard()` before any model call. A hazardous-item refusal therefore looks like a model output when no request was made. Observed in the demo recording. | Return a `model_called` flag from the server and label from that, or use a third label such as "LOCAL SCREEN". |
 
-D1 to D6 and D10 were corrected in `README.md` in the same commit as this record, and the `start.ps1` version message was aligned with D3. D7, D8, D9 and D11 are recorded only.
+D1 to D6 and D10 were corrected in `README.md` in the same commit as this record, and the `start.ps1` version message was aligned with D3. D7, D8, D9, D11 and D12 are recorded only.
 
 ## 7. What this check does and does not establish
 

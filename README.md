@@ -5,7 +5,7 @@ An AILT9019 prototype that checks everyday items against a small, traceable cata
 ## Current state
 
 - Working local path: browser input → catalog lookup → rule/category validation → per-part results with official source links.
-- Optional AI path: sends the query and the complete rule file to an OpenAI-compatible Chat Completions API, then validates the returned structure, rule IDs and categories. The course-sponsored Alibaba Cloud Bailian `qwen3.8-flash` connection has been verified. See `evidence/live_results.json` for the complete serial acceptance run. Mocked transport tests remain separate from live evaluation.
+- Optional AI path: sends the query and the complete rule file to an OpenAI-compatible Chat Completions API, then validates the returned structure, rule IDs and categories. The course-sponsored Alibaba Cloud Bailian `qwen3.8-flash` connection has been verified. See `evidence/live_results.json` for the first serial acceptance run and `evidence/live_results_full_rerun.json` for the full suite after the rule-ID fix. Mocked transport tests remain separate from live evaluation.
 - Catalog mode does not call a model, simulate a model, or replay model answers. It only matches explicitly supported names. Unknown components cause refusal of the whole request.
 - This package was AI-generated on 25 October 2026. Team members must review it, run it themselves and describe their actual contributions honestly.
 
@@ -87,7 +87,15 @@ The course requires a <=60-second MP4, `repository_link.txt` and the one-page st
 
 The user reported no prior implementation work and subsequently supplied the group API credentials and setup information. No other member's completed contribution has been confirmed. Each member should complete a specific review, test, documentation or implementation task and record it accurately before finalizing the status sheet. No Moodle submission has been made.
 
-First live acceptance run: 30/32 (19/20 classification, 11/12 refusal). Both non-passes returned `unavailable` with no bin assignment, so they are missing verifiable answers rather than wrong classifications. L17 is explained by unpadded rule IDs; a narrow fix now accepts R1–R9 only when the canonical R01–R09 rule exists and the bin matches. L32 is not explained by that fix: the refusal path never reads a rule ID, and the rerun recorded a different model response. L17 and L32 passed a separate targeted rerun 2/2. The complete 32-case suite was not rerun after the change, so the post-fix 32-case pass rate is unmeasured; both records and their source hashes are retained. Current unit tests: 20/20; catalog cases: 36/36. Both were independently rerun on macOS on 25 October 2026 with identical source hashes.
+Live acceptance history, all with `qwen3.8-flash`:
+
+| Run | Time (HKT) | Result |
+|---|---|---|
+| First full suite | 25 Oct 00:52 | 30/32 (19/20 classification, 11/12 refusal) |
+| Targeted rerun of L17 and L32 | 25 Oct 00:58 | 2/2 |
+| Full suite after the rule-ID fix | 25 Oct 18:01 | 32/32 (20 classification, 12 refusal) |
+
+Both non-passes in the first run returned `unavailable` with no bin assignment, so they were missing verifiable answers rather than wrong classifications. L17 is explained by unpadded rule IDs; the fix now accepts R1–R9 only when the canonical R01–R09 rule exists and the bin matches. L32 is not explained by that fix: the refusal path never reads a rule ID, and its targeted rerun recorded a different model response. The 32/32 result is a single run of the same AI-authored suite at temperature 0, not independent validation, and it does not support an accuracy claim beyond what this section already says. Current unit tests: 20/20; catalog cases: 36/36; both independently rerun on macOS with identical source hashes. All three live records and their source hashes are retained.
 
 Screenshots of catalog mode and live AI mode are in `evidence/browser_coffee_set.png` and `evidence/browser_live_result.png`. The install and documentation check, including the environment it was run in, is in `evidence/install_reproduction_yang.md`.
 

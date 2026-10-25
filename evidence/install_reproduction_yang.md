@@ -15,7 +15,7 @@ This record covers what was actually executed on this machine. Nothing below is 
 | Python A | 3.12.13 (pyenv), new virtual environment |
 | Python B | 3.13.12, separate virtual environment |
 | Clone | fresh `git clone`, no cached environment, no prior `.venv` |
-| API key | not used. AI mode was not exercised end to end |
+| API key | supplied 25 Oct, loaded from a file outside the repository, used only for the live section |
 
 ## 2. Commands executed, in order
 
@@ -80,20 +80,25 @@ The rerun reproduces the committed record exactly:
 
 Identical source hashes mean `main.py`, `rules.json` and `tests/cases.json` have not changed since the recorded catalog run. The 36/36 figure is reproducible on a clean machine, not only on the author's.
 
-## 5. Live-model evidence, re-read rather than re-run
+## 5. Live model, executed with the group key
 
-AI mode was not re-executed because the key is deliberately withheld from the repository and was not supplied to this check. The recorded evidence was inspected instead.
+The group key was supplied on 25 October and placed in `/Users/andi/Documents/ailt9019/.env`, outside the repository. It reached the server as an environment variable, never on a command line, never in a tracked file, and never in any captured output. The application reads `BAILIAN_API_KEY`; a variable named only `API_KEY` is not read by the code, so it was mapped at launch.
 
-`evidence/live_results.json`: 32 planned, 32 completed, 30 passed. Expected statuses 20 classified and 12 refused; 19 and 11 passed.
+Three spot queries before the suite:
 
-Both non-passes, L17 and L32, have `status: unavailable` and no parts. `unavailable` is only produced when the upstream call fails or the returned structure fails validation. Neither is a wrong bin assignment, so the honest description of the first run is "30 of 32 produced an expected, verifiable answer; 2 produced no verifiable answer", not "2 wrong answers".
+| Query | Result | Seconds |
+|---|---|---|
+| a clean takeaway coffee cup with a plastic lid and a paper sleeve | R10, R08, R09 | 6.4 |
+| An unidentified object attached to some dry office paper. | refused | 6.1 |
+| a half-full milk tea cup with pearls | refused | 5.3 |
 
-`evidence/live_targeted_rerun.json`: 2 of 2 passed, with a newer `main.py` hash (`6518f4ef...`, the same hash this check verified).
+Full suite, `evaluate_live.py --run`, 32 cases serial with a one-second gap: 32/32, of which 20 classified and 12 refused, mean 3.48 s, slowest 8.64 s. Written to `evidence/live_results_full_rerun.json`. The first-run record was backed up and restored, so `evidence/live_results.json` still holds the original 30/32 result at its original hash (`9473eb0a...`).
 
-Causation check on the rerun:
+The rerun records `main.py` as `6518f4ef...`, the same hash this documentation check verified, so the suite ran against the post-fix code.
 
-- L17 expected R08/R09/R10 and now returns them. The narrow fix (accept `R1`-`R9` only when the canonical `R01`-`R09` rule exists and the bin matches) plausibly explains it: unpadded IDs previously raised `ValueError` and became `unavailable`.
-- L32 expected `refused` and now returns `refused`. The refusal path never reads a rule ID, so the ID normalization cannot be the cause. The rerun recorded a different model response. The cause is not isolated and the case should not be cited as fixed by that change.
+Why the first run's two non-passes were not wrong answers: both returned `unavailable` with no parts, which the endpoint produces only when the upstream call fails or the returned structure fails validation. L17 is explained by unpadded rule IDs, which the fix now normalizes. L32 is not: the refusal path never reads a rule ID, and its targeted rerun recorded a different model response. The suite passing now does not make that attribution correct, and the README keeps the correction rather than quietly dropping it.
+
+What 32/32 does not mean: one run, temperature 0, the same AI-authored 32-case suite, hand-picked inputs. It is a regression signal, not an accuracy rate.
 
 ## 6. Defects found
 
@@ -104,7 +109,7 @@ Severity is about what a marker or TA would hit, not about code quality.
 | D1 | Medium | Setup and verify commands are PowerShell only. On a stock macOS there is no `python` on `PATH`, so the first documented command fails. `start.ps1` has no POSIX equivalent. | Dual-platform command blocks; name `python3` for macOS. A `start.sh` is optional. |
 | D2 | Medium | `requirements-lock.txt` exists but the README never mentions it, so a reader installs unpinned transitive dependencies. | Document `-r requirements-lock.txt` as the exact-reproduction path. |
 | D3 | Low | README states Python 3.12 only. 3.13.12 also passes 20/20. The same stale version appears in a `start.ps1` error message. | State 3.12 and 3.13 as verified, and align the launcher message. |
-| D4 | High (accuracy) | README and the group summary attribute both live-test failures to the rule-ID fix. The evidence supports that for L17 only; L32 passed on a different model response. Both were `unavailable`, not misclassifications. | Reword to what the evidence shows, and state that the 32-case pass rate after the fix is unmeasured. |
+| D4 | High (accuracy) | README and the group summary attribute both live-test failures to the rule-ID fix. The evidence supports that for L17 only; L32 passed on a different model response. Both were `unavailable`, not misclassifications. | Reword to what the evidence shows, keep the attribution correction, and add the post-fix full rerun (32/32) without turning it into an accuracy claim. |
 | D5 | Low | README says the live script "stops after two unavailable responses"; the counter resets after each successful call, so it stops after two consecutive ones. | Add "consecutive". |
 | D6 | Low | The live-test section says `python evaluate_live.py --run`, but the dependencies live in `.venv`, and the script hardcodes `127.0.0.1:8019` without the README saying the server must listen there. | Use the venv interpreter and state the fixed address. |
 | D7 | Low | `evidence/browser_*.png` are JPEG data, not PNG. They open correctly in browsers and viewers, but the extension is wrong. | Rename to `.jpg` or re-encode. Cosmetic only; no functional impact. |
@@ -122,12 +127,13 @@ Establishes:
 - A clean clone installs and runs on macOS with Python 3.12 and 3.13 using only documented commands.
 - The three documented demo queries behave as described, including both refusal cases.
 - 20/20 unit tests and 36/36 catalog cases reproduce, with identical source hashes.
+- AI mode works end to end against the course Bailian endpoint: three spot queries plus 32/32 on the acceptance suite after the fix.
 - No API key, token or `.env` file exists in the working tree or anywhere in git history.
 
 Does not establish:
 
 - That the documented steps work on Windows. Only macOS was tested here. `start.ps1` was reviewed by reading it, not by running it, and no Windows machine was available.
-- That AI mode works. The key is withheld; the claim rests on the author's recorded run.
+- That 32/32 generalises. It is one run of a small AI-authored suite with hand-picked inputs, and it says nothing about unseen phrasing, multilingual input or adversarial wording.
 - That the rules match current HKU signage. Not checked here.
 - That 19/20 and 11/12 measure model accuracy. The suite is AI-authored and small, as the README already says.
 

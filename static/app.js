@@ -172,3 +172,10 @@ document.querySelectorAll('[data-query]').forEach(button => {
   button.addEventListener('click', invalidatePendingCheck);
 });
 
+
+const inputFeedback = document.querySelector('#input-feedback');
+function updateInputFeedback() {
+  if (inputFeedback) inputFeedback.textContent = `${input.value.length} / 400 characters`;
+}
+input.addEventListener('input', updateInputFeedback);
+updateInputFeedback();

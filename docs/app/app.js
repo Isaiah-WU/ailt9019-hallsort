@@ -3,7 +3,6 @@
 
 let DATA = null;
 const RULES = {};
-const MODEL = 'nvidia/nemotron-3.5-super-vl:free';
 const PROVIDERS = [{id: 'openrouter', label: 'OpenRouter', vision: true}];
 const NOTICE = 'Educational prototype. These rules describe HKU re Kiosk, not every hall bin. Posted signage and staff instructions take precedence.';
 
@@ -123,7 +122,7 @@ async function callProvider(messages, maxTokens) {
             'X-Title': 'HallSort'
         },
         body: JSON.stringify({
-            model: MODEL, messages: messages,
+            model: loadKey().model, messages: messages,
             response_format: {type: 'json_object'}, temperature: 0, max_tokens: maxTokens
         })
     });
@@ -191,10 +190,18 @@ let providerName='the configured model provider';
 let latestCheckId = 0;
 let serverInfo = null;
 
-const KEY_STORE='hallsort.key', PROV_STORE='hallsort.provider';
+const DEFAULT_MODEL = 'nvidia/nemotron-3.5-super-vl:free';
+const KEY_STORE='hallsort.key', PROV_STORE='hallsort.provider', MODEL_STORE='hallsort.model';
 function loadKey(){
-  try{ return {provider: sessionStorage.getItem(PROV_STORE)||'openrouter', key: (sessionStorage.getItem(KEY_STORE)||'').trim()} }
-  catch(e){ return {provider:'openrouter', key:''} }
+  try{
+    return {
+      provider: sessionStorage.getItem(PROV_STORE) || 'openrouter',
+      key: (sessionStorage.getItem(KEY_STORE) || '').trim(),
+      model: (sessionStorage.getItem(MODEL_STORE) || '').trim() || DEFAULT_MODEL
+    };
+  } catch(e){
+    return {provider:'openrouter', key:'', model: DEFAULT_MODEL};
+  }
 }
 function authHeaders(){
   const k=loadKey();
@@ -205,10 +212,11 @@ function providerLabel(id){
   return p ? p.label : id;
 }
 function refreshModeLabel(){
-    const k = loadKey();
-    mode.options[1].textContent = k.key
-        ? 'AI interpretation · your OpenRouter key'
-        : 'AI interpretation · add your key';
+    let own = '';
+    try { own = (sessionStorage.getItem(KEY_STORE) || '').trim(); } catch (e) {}
+    mode.options[1].textContent = own
+        ? 'AI interpretation · your key'
+        : 'AI interpretation · add the demo key from the report';
 }
 const form=document.querySelector('#check-form'), input=document.querySelector('#item'), mode=document.querySelector('#mode'), results=document.querySelector('#results'), submit=document.querySelector('#submit');
 function el(tag,text,cls){const n=document.createElement(tag);n.textContent=text;if(cls)n.className=cls;return n}
@@ -410,7 +418,6 @@ const dropBtn = document.querySelector('#drop-photo');
 const photoStatus = document.querySelector('#photo-status');
 const preview = document.querySelector('#photo-preview');
 const keyPanel = document.querySelector('#key-panel');
-const keyProvider = document.querySelector('#key-provider');
 const keyValue = document.querySelector('#key-value');
 const keyClear = document.querySelector('#key-clear');
 
@@ -513,25 +520,25 @@ if (photoInput) {
 }
 
 if (keyPanel) {
+    const keyModel = document.querySelector('#key-model');
     const saved = loadKey();
-    keyProvider.value = saved.provider;
     keyValue.value = saved.key;
-    if (saved.key) keyPanel.open = true;
+    keyModel.value = saved.model;
 
     const persist = () => {
         try {
-            sessionStorage.setItem(PROV_STORE, keyProvider.value);
             sessionStorage.setItem(KEY_STORE, keyValue.value.trim());
+            sessionStorage.setItem(MODEL_STORE, keyModel.value.trim());
         } catch (error) { /* private mode, ignore */ }
         refreshModeLabel();
     };
 
     keyValue.addEventListener('input', persist);
-    keyProvider.addEventListener('change', persist);
+    keyModel.addEventListener('input', persist);
     keyClear.addEventListener('click', () => {
         keyValue.value = '';
-        try { sessionStorage.removeItem(KEY_STORE); } catch (error) {}
+        keyModel.value = DEFAULT_MODEL;
+        try { sessionStorage.removeItem(KEY_STORE); sessionStorage.removeItem(MODEL_STORE); } catch (error) {}
         refreshModeLabel();
-        keyValue.focus();
     });
 }

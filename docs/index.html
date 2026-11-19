@@ -41,13 +41,13 @@
     <section class="dark" id="demo" aria-labelledby="demo-title">
       <div class="wrap split">
         <div>
-          <p class="context">Recorded walkthrough · 57 seconds</p>
+          <p class="context">Final demo · 1 minute 31 seconds</p>
           <h2 id="demo-title">See HallSort in use</h2>
-          <p>The recording follows a cup through catalog mode, shows refusals for unsupported requests and finishes with a live model response.</p>
-          <a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/00eba9dcfd05441b596b5752d6102607466a9144/submission/hallsort-demo.mp4">Open the recording on GitHub</a>
+          <p>The final build sorts a coffee cup set, refuses an unknown item and labels a local safety check in AI mode. English synthetic narration and captions explain the recorded actions and the model test history.</p>
+          <a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/main/submission/hallsort-final-demo.mp4">Open the recording on GitHub</a>
         </div>
         <video controls playsinline preload="none" poster="demo-poster.jpg" aria-label="HallSort demonstration with narration and on-screen captions">
-          <source src="https://raw.githubusercontent.com/Isaiah-WU/ailt9019-hallsort/00eba9dcfd05441b596b5752d6102607466a9144/submission/hallsort-demo.mp4" type="video/mp4">
+          <source src="https://raw.githubusercontent.com/Isaiah-WU/ailt9019-hallsort/main/submission/hallsort-final-demo.mp4" type="video/mp4">
           Your browser cannot play the embedded recording. Use the GitHub recording link.
         </video>
       </div>
@@ -62,9 +62,11 @@
       </section>
       <section id="evaluation" aria-labelledby="eval-title">
         <h2 id="eval-title">What we tested</h2>
-        <p>The October 25 records include 36 passing catalog cases. The first 32-case live run produced 30 passes and two unavailable responses. A later run passed all 32 cases. These were AI-authored regression examples, and refusal counts include local checks. Accuracy on unseen items remains unmeasured by these runs.</p>
+        <p>On November 19, the final Windows build passed 26 contract tests and all 36 fixed catalog cases. The live evaluation stopped after two unavailable responses. A direct provider check returned HTTP 403 with an access denial.</p>
+        <p>On October 25, the first live run produced 30 passes across 32 examples. A later run passed all 32. The live suite used AI-authored regression examples and included local refusals. Accuracy on unseen items remains unmeasured by these runs.</p>
         <ul class="links">
-          <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/00eba9dcfd05441b596b5752d6102607466a9144/evidence/catalog_results.json">Catalog results</a></li>
+          <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/main/evidence/final_offline.md">Final Windows checks</a></li>
+          <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/main/evidence/live_results_november_20261119_194843_641633.json">November live run</a></li>
           <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/00eba9dcfd05441b596b5752d6102607466a9144/evidence/live_results.json">First live run</a></li>
           <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/00eba9dcfd05441b596b5752d6102607466a9144/evidence/live_results_full_rerun.json">Full live rerun</a></li>
         </ul>

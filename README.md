@@ -2,7 +2,7 @@
 
 HallSort helps an HKU student decide how to separate an item at the **re Kiosk**. A clean takeaway coffee set, for example, yields a plastic lid (R08), paper sleeve (R09) and paper cup for the beverage-carton stream (R10). Each part links to the campus guidance used for that decision.
 
-**[Project page](https://isaiah-wu.github.io/ailt9019-hallsort/) · [Source rules](rules.json) · [Final Windows verification](evidence/final_offline.md)**
+**[Project page](https://isaiah-wu.github.io/ailt9019-hallsort/) · [Final demo with English narration and captions](submission/hallsort-final-demo.mp4) · [Source rules](rules.json) · [Final Windows verification](evidence/final_offline.md)**
 
 ## Run HallSort
 

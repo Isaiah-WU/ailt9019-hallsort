@@ -1,0 +1,63 @@
+1
+00:00:00,300 --> 00:00:05,784
+HallSort checks everyday items against HKU's published re Kiosk rules.
+
+2
+00:00:06,154 --> 00:00:10,897
+This is the final local app. The narration is synthetic.
+
+3
+00:00:11,267 --> 00:00:17,241
+In catalog mode, choosing the coffee cup set updates the input and character count.
+
+4
+00:00:17,611 --> 00:00:21,830
+One check returns three parts, each with a source.
+
+5
+00:00:22,200 --> 00:00:29,023
+The clean lid goes to plastic, the sleeve to paper, and the clean paper cup to beverage cartons.
+
+6
+00:00:29,393 --> 00:00:33,267
+These categories come from the HKU Photo Guide.
+
+7
+00:00:33,637 --> 00:00:37,241
+Now we add an unknown object to office paper.
+
+8
+00:00:37,611 --> 00:00:43,474
+HallSort refuses the entire request, leaving the unknown part unclassified.
+
+9
+00:00:43,844 --> 00:00:48,693
+In AI mode, a lithium battery triggers a local safety check.
+
+10
+00:00:49,063 --> 00:00:53,717
+The label says no model call, and the app assigns no bin.
+
+11
+00:00:54,087 --> 00:00:59,400
+For an ordinary AI query, this recording uses a server with no key.
+
+12
+00:00:59,770 --> 00:01:05,694
+The app shows that AI mode is unavailable. Catalog mode still works.
+
+13
+00:01:06,064 --> 00:01:12,003
+On October twenty-fifth, the full live rerun passed thirty-two curated cases.
+
+14
+00:01:12,373 --> 00:01:18,076
+On November nineteenth, a new run stopped after two unavailable responses.
+
+15
+00:01:18,446 --> 00:01:25,159
+On the final Windows build, twenty-six contract tests and thirty-six catalog cases passed.
+
+16
+00:01:25,529 --> 00:01:30,623
+At a collection point, follow its posted signage and staff guidance.

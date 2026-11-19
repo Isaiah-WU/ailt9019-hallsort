@@ -13,7 +13,7 @@
     <div class="wrap mast">
       <a class="brand" href="#main">HallSort</a>
       <nav aria-label="Project navigation">
-        <a href="https://hku-hallsort.app.workbuddy.host/?sharecode=RXNBLAD57V">Live app</a>
+        <a href="app/">Live app</a>
         <a href="#demo">Demo</a>
         <a href="#built">Built by us</a>
         <a href="#evaluation">Evaluation</a>
@@ -28,7 +28,7 @@
         <h1 id="hero-title">Where does each part of a coffee cup go?</h1>
         <p class="lead">HallSort helps students sort everyday items at HKU re Kiosks. Enter an item to see its parts, collection categories and the campus guidance behind each result.</p>
         <div class="actions">
-          <a class="primary" href="https://hku-hallsort.app.workbuddy.host/?sharecode=RXNBLAD57V">Open the live app <span aria-hidden="true">↗</span></a>
+          <a class="primary" href="app/">Open the live app <span aria-hidden="true">↗</span></a>
           <a class="secondary" href="#demo">Watch the demo <span aria-hidden="true">↓</span></a>
         </div>
       </div>
@@ -134,7 +134,7 @@ python3 -m venv .venv
 <pre><code>.venv/bin/python -m pytest -q          # 26 passed
 .venv/bin/python evaluate.py           # 36/36 passed</code></pre>
         <p>AI mode needs a provider key set on the server, never in the browser. The <a href="https://github.com/Isaiah-WU/ailt9019-hallsort#readme">README</a> covers Windows, the lockfile and the optional provider configuration.</p>
-        <p>This page and the app are two different artefacts. The app is catalog-only on the public host because no provider key is set there; AI mode is demonstrated in the recording above.</p>
+        <p>The app runs entirely in your browser. The rule file, the refusal checks and the validation are the same code as the reference FastAPI service, ported to JavaScript so GitHub Pages can serve it. AI mode and photo descriptions call the provider directly from your tab using your own key, which is never sent anywhere else.</p>
       </section>
     </div>
     <section class="team" aria-labelledby="team-title">

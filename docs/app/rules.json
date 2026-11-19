@@ -1,0 +1,289 @@
+{
+  "version": "2026-10-25.1",
+  "scope": "HKU re Kiosk; verify collection at the point of disposal",
+  "review_date": "2026-10-25",
+  "rules": [
+    {
+      "id": "R01",
+      "item": "office paper",
+      "bin": "Paper",
+      "text": "Dry office paper belongs in paper recycling.",
+      "source": "https://www.wastereduction.hku.hk/_files/ugd/bccd45_652bab3854994da9a05b96ed09580df4.pdf",
+      "source_title": "HKU Recycling 101 poster"
+    },
+    {
+      "id": "R02",
+      "item": "cardboard",
+      "bin": "Paper",
+      "text": "Uncontaminated corrugated cardboard belongs in paper recycling.",
+      "source": "https://www.wastereduction.hku.hk/_files/ugd/bccd45_652bab3854994da9a05b96ed09580df4.pdf",
+      "source_title": "HKU Recycling 101 poster"
+    },
+    {
+      "id": "R03",
+      "item": "clean aluminium can",
+      "bin": "Metal",
+      "text": "Aluminium beverage cans belong in metal recycling; empty and clean first.",
+      "source": "https://www.wastereduction.hku.hk/_files/ugd/bccd45_652bab3854994da9a05b96ed09580df4.pdf",
+      "source_title": "HKU Recycling 101 poster"
+    },
+    {
+      "id": "R04",
+      "item": "clean plastic bottle",
+      "bin": "Plastic",
+      "text": "Beverage plastic bottles belong in plastic recycling; empty and clean first.",
+      "source": "https://www.wastereduction.hku.hk/_files/ugd/bccd45_652bab3854994da9a05b96ed09580df4.pdf",
+      "source_title": "HKU Recycling 101 poster"
+    },
+    {
+      "id": "R05",
+      "item": "clean glass bottle",
+      "bin": "Glass Bottle",
+      "text": "Beverage, food and sauce glass bottles use glass-bottle collection; clean first.",
+      "source": "https://www.wastereduction.hku.hk/_files/ugd/bccd45_652bab3854994da9a05b96ed09580df4.pdf",
+      "source_title": "HKU Recycling 101 poster"
+    },
+    {
+      "id": "R06",
+      "item": "rinsed beverage carton",
+      "bin": "Beverage Cartons",
+      "text": "Use carton collection after removing straws and wraps, rinsing and cutting a corner.",
+      "source": "https://www.wastereduction.hku.hk/_files/ugd/bccd45_652bab3854994da9a05b96ed09580df4.pdf",
+      "source_title": "HKU Recycling 101 poster"
+    },
+    {
+      "id": "R07",
+      "item": "clean pizza box",
+      "bin": "Paper",
+      "text": "Clean pizza boxes are accepted in paper recycling.",
+      "source": "https://www.wastereduction.hku.hk/photo-guide",
+      "source_title": "HKU Photo Guide"
+    },
+    {
+      "id": "R08",
+      "item": "clean coffee cup lid",
+      "bin": "Plastic",
+      "text": "The clean lid of a takeaway coffee cup belongs in plastic recycling.",
+      "source": "https://www.wastereduction.hku.hk/photo-guide",
+      "source_title": "HKU Photo Guide"
+    },
+    {
+      "id": "R09",
+      "item": "coffee cup sleeve",
+      "bin": "Paper",
+      "text": "A takeaway coffee cup sleeve belongs in paper recycling.",
+      "source": "https://www.wastereduction.hku.hk/photo-guide",
+      "source_title": "HKU Photo Guide"
+    },
+    {
+      "id": "R10",
+      "item": "clean paper coffee cup",
+      "bin": "Beverage Cartons",
+      "text": "A clean takeaway paper coffee cup uses the Tetra Pak collection stream.",
+      "source": "https://www.wastereduction.hku.hk/photo-guide",
+      "source_title": "HKU Photo Guide"
+    },
+    {
+      "id": "R11",
+      "item": "baking paper",
+      "bin": "Not accepted",
+      "text": "Baking paper is not accepted by this re Kiosk guide; check local disposal instructions.",
+      "source": "https://www.wastereduction.hku.hk/photo-guide",
+      "source_title": "HKU Photo Guide"
+    },
+    {
+      "id": "R12",
+      "item": "foam net",
+      "bin": "Plastic",
+      "text": "Foam nets belong in plastic recycling.",
+      "source": "https://www.wastereduction.hku.hk/photo-guide",
+      "source_title": "HKU Photo Guide"
+    },
+    {
+      "id": "R13",
+      "item": "clean plastic food tray",
+      "bin": "Plastic",
+      "text": "Plastic food trays belong in plastic recycling; remove food residue.",
+      "source": "https://www.wastereduction.hku.hk/photo-guide",
+      "source_title": "HKU Photo Guide"
+    },
+    {
+      "id": "R14",
+      "item": "mooncake tin",
+      "bin": "Metal",
+      "text": "Metal mooncake containers belong in metal recycling.",
+      "source": "https://www.wastereduction.hku.hk/photo-guide",
+      "source_title": "HKU Photo Guide"
+    },
+    {
+      "id": "R15",
+      "item": "foil lined snack bag",
+      "bin": "Not accepted",
+      "text": "Foil-lined snack packaging is not accepted here; check local disposal instructions.",
+      "source": "https://www.wastereduction.hku.hk/photo-guide",
+      "source_title": "HKU Photo Guide"
+    },
+    {
+      "id": "R16",
+      "item": "tissue paper",
+      "bin": "Not accepted",
+      "text": "Tissue/toilet paper is excluded from paper recycling; check local disposal instructions.",
+      "source": "https://www.wastereduction.hku.hk/_files/ugd/bccd45_652bab3854994da9a05b96ed09580df4.pdf",
+      "source_title": "HKU Recycling 101 poster"
+    }
+  ],
+  "items": [
+    {
+      "aliases": [
+        "office paper",
+        "dry office paper",
+        "办公纸",
+        "辦公紙"
+      ],
+      "rules": [
+        "R01"
+      ]
+    },
+    {
+      "aliases": [
+        "cardboard",
+        "clean cardboard",
+        "纸皮",
+        "紙皮"
+      ],
+      "rules": [
+        "R02"
+      ]
+    },
+    {
+      "aliases": [
+        "clean aluminium can",
+        "clean aluminum can",
+        "aluminium can",
+        "aluminum can"
+      ],
+      "rules": [
+        "R03"
+      ]
+    },
+    {
+      "aliases": [
+        "clean plastic bottle",
+        "clean water bottle",
+        "乾淨膠樽"
+      ],
+      "rules": [
+        "R04"
+      ]
+    },
+    {
+      "aliases": [
+        "clean glass bottle",
+        "clean sauce bottle"
+      ],
+      "rules": [
+        "R05"
+      ]
+    },
+    {
+      "aliases": [
+        "rinsed beverage carton",
+        "prepared milk carton"
+      ],
+      "rules": [
+        "R06"
+      ]
+    },
+    {
+      "aliases": [
+        "clean pizza box"
+      ],
+      "rules": [
+        "R07"
+      ]
+    },
+    {
+      "aliases": [
+        "clean coffee cup lid"
+      ],
+      "rules": [
+        "R08"
+      ]
+    },
+    {
+      "aliases": [
+        "coffee cup sleeve"
+      ],
+      "rules": [
+        "R09"
+      ]
+    },
+    {
+      "aliases": [
+        "clean paper coffee cup"
+      ],
+      "rules": [
+        "R10"
+      ]
+    },
+    {
+      "aliases": [
+        "baking paper"
+      ],
+      "rules": [
+        "R11"
+      ]
+    },
+    {
+      "aliases": [
+        "foam net"
+      ],
+      "rules": [
+        "R12"
+      ]
+    },
+    {
+      "aliases": [
+        "clean plastic food tray"
+      ],
+      "rules": [
+        "R13"
+      ]
+    },
+    {
+      "aliases": [
+        "mooncake tin"
+      ],
+      "rules": [
+        "R14"
+      ]
+    },
+    {
+      "aliases": [
+        "foil lined snack bag"
+      ],
+      "rules": [
+        "R15"
+      ]
+    },
+    {
+      "aliases": [
+        "tissue paper",
+        "toilet paper"
+      ],
+      "rules": [
+        "R16"
+      ]
+    },
+    {
+      "aliases": [
+        "clean takeaway coffee cup set"
+      ],
+      "rules": [
+        "R08",
+        "R09",
+        "R10"
+      ]
+    }
+  ]
+}

@@ -10,3 +10,19 @@
     background: #e4e9df;
     color: #244a39;
 }
+
+.photo-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 6px}
+.ghost-btn{display:inline-block;background:#f8faf6;border:1px solid #d9e0d4;border-radius:8px;padding:9px 12px;font-size:12px;color:#3d5a49;cursor:pointer;font-weight:600}
+.ghost-btn:hover{background:#eef2ea}
+.ghost-btn:disabled{opacity:.5;cursor:not-allowed}
+.link-btn{background:none;border:0;padding:6px 2px;font-size:12px;color:#657568;text-decoration:underline;cursor:pointer}
+#photo-preview[hidden]{display:none}
+#photo-preview{display:block;max-width:100%;max-height:180px;border-radius:10px;border:1px solid #d5dfd2;margin:8px 0 4px;object-fit:cover}
+#photo-status:empty{display:none}
+.key-panel{margin:14px 0 18px;border:1px solid #d9e0d4;border-radius:10px;background:#f8faf6;padding:0 14px}
+.key-panel summary{cursor:pointer;padding:12px 0;font-size:12px;font-weight:700;color:#3d5a49;letter-spacing:.02em}
+.key-body{padding:2px 0 14px}
+.key-body label{font-size:12px;margin:10px 0 6px;font-weight:600}
+.key-body input{width:100%;padding:10px;border:1px solid #ccd8c8;border-radius:8px;font:13px/1.4 ui-monospace,Menlo,monospace;color:#18382f;background:white}
+.key-body input:focus{outline:3px solid #9bb27d;outline-offset:2px}
+.key-body .fine{margin:10px 0 2px}

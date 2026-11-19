@@ -10,6 +10,7 @@ client = TestClient(main.app)
 def isolated_keys(monkeypatch):
     monkeypatch.delenv('BAILIAN_API_KEY', raising=False)
     monkeypatch.delenv('OPENAI_API_KEY', raising=False)
+    monkeypatch.delenv('OPENROUTER_API_KEY', raising=False)
 
 
 def test_bailian_configuration_does_not_expose_key(monkeypatch):

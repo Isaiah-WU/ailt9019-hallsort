@@ -30,6 +30,12 @@ python3 -m venv .venv
 
 Open [HallSort locally](http://127.0.0.1:8019). Use **Catalog** and try `clean takeaway coffee cup set`. Then try `office paper + mystery object`. An unknown part makes the whole request decline classification. Catalog runs without an API key. The [public project page](https://isaiah-wu.github.io/ailt9019-hallsort/) includes a recorded demonstration.
 
+### Public build
+
+[The app also runs from GitHub Pages](https://isaiah-wu.github.io/ailt9019-hallsort/app/). Pages cannot execute Python, so `docs/app/` is a static client: the same `rules.json`, guard, catalog matcher and validator, ported to JavaScript, with the provider call going directly from the browser. Parity is checked against this service, and all 36 recorded catalog cases return identical statuses and bins.
+
+The public build has no server, so AI mode and photo descriptions need a provider key. It is entered in **AI settings**, kept in that tab's `sessionStorage`, and never stored. The model identifier is editable and defaults to `nvidia/nemotron-3.5-super-vl:free`.
+
 ## How it works
 
 - **Catalog** matches known names and aliases in 17 entries against 16 source-linked rules. Enter up to 400 characters and separate items with `+` or `;`. A query can return up to eight parts.
@@ -81,7 +87,7 @@ Use `--suite october` to reproduce the earlier set or `--cases N01` with the Nov
 
 The [HKU Photo Guide](https://www.wastereduction.hku.hk/photo-guide), [Recycling 101](https://www.wastereduction.hku.hk/recycling-101) and [facility directory](https://www.wastereduction.hku.hk/re-facilities) document the kiosk and its collection streams. The rule file links individual decisions to the corresponding guide or poster. The [November source review](evidence/final_scope.md) records the distinction between a kiosk and a specific hall's facilities.
 
-HallSort accepts a text description, or a photo that it turns into a description for the user to confirm. It cannot inspect an item's cleanliness or a collection point's current signage, and it never assigns a category from an image. Food waste, hazardous disposal instructions and hall-specific routing are outside the verified scope. Follow posted instructions at the collection point. Run the application on loopback. The public site hosts project information and a video.
+HallSort accepts a text description, or a photo that it turns into a description for the user to confirm. It cannot inspect an item's cleanliness or a collection point's current signage, and it never assigns a category from an image. Food waste, hazardous disposal instructions and hall-specific routing are outside the verified scope. Follow posted instructions at the collection point. The reference service runs on loopback; the public build runs the same rules in the browser and is the deployment used for evaluation.
 
 ## Project credits
 

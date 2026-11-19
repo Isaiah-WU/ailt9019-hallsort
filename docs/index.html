@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="HallSort is a student project that matches everyday items to published HKU re Kiosk recycling guidance. See the demo, rules and test evidence.">
+  <meta name="description" content="HallSort is a student project that matches everyday items to published HKU re Kiosk recycling guidance. Try the live app, see the demo, read the rules and the test evidence.">
   <title>HallSort | HKU re Kiosk recycling guide</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -13,7 +13,9 @@
     <div class="wrap mast">
       <a class="brand" href="#main">HallSort</a>
       <nav aria-label="Project navigation">
+        <a href="https://hku-hallsort.app.workbuddy.host/?sharecode=RXNBLAD57V">Live app</a>
         <a href="#demo">Demo</a>
+        <a href="#built">Built by us</a>
         <a href="#evaluation">Evaluation</a>
         <a href="https://github.com/Isaiah-WU/ailt9019-hallsort">GitHub</a>
       </nav>
@@ -25,7 +27,10 @@
         <p class="context">HKU · AILT9019 · Group 12</p>
         <h1 id="hero-title">Where does each part of a coffee cup go?</h1>
         <p class="lead">HallSort helps students sort everyday items at HKU re Kiosks. Enter an item to see its parts, collection categories and the campus guidance behind each result.</p>
-        <a class="primary" href="#demo">Watch the demo <span aria-hidden="true">↓</span></a>
+        <div class="actions">
+          <a class="primary" href="https://hku-hallsort.app.workbuddy.host/?sharecode=RXNBLAD57V">Open the live app <span aria-hidden="true">↗</span></a>
+          <a class="secondary" href="#demo">Watch the demo <span aria-hidden="true">↓</span></a>
+        </div>
       </div>
       <aside class="example" aria-labelledby="example-title">
         <p class="context">Catalog example</p>
@@ -52,30 +57,98 @@
         </video>
       </div>
     </section>
-    <div class="wrap reading">
-      <section aria-labelledby="workflow-title">
-        <h2 id="workflow-title">How the result is produced</h2>
-        <p>Catalog mode checks the description against 17 entries that reference 16 recycling rules. It can return a separate category for each supported part. An unknown part causes the whole request to be refused.</p>
-        <p>In AI mode, eligible descriptions and the recycling rules are sent to a configured model. The server checks that each returned rule exists and matches its category, then attaches the official source. Local checks can refuse a request before any model call.</p>
-        <p>HallSort covers published re Kiosk guidance. The app cannot inspect contamination or verify which collection bins your hall has. Follow posted signs and staff instructions at the collection point.</p>
-        <a href="https://www.wastereduction.hku.hk/re-facilities">Find HKU collection facilities</a>
+    <div class="wrap reading single">
+      <section id="built" aria-labelledby="built-title">
+        <h2 id="built-title">What the team built</h2>
+        <p class="lead-para">HallSort is a small application over published guidance. The recycling rules belong to HKU. The routing, the validation and the refusal behaviour belong to us.</p>
+        <table class="rows rows-3">
+          <caption class="visually-hidden">Which parts of HallSort the team wrote and which parts are existing libraries or services</caption>
+          <thead><tr><th scope="col">Part</th><th scope="col">Origin</th><th scope="col">What it does</th></tr></thead>
+          <tbody>
+            <tr><td>Rule catalog and aliases</td><td><strong>Team</strong></td><td>16 rules mapped to the HKU poster and Photo Guide, with 17 catalog entries and their alias lists.</td></tr>
+            <tr><td>Whole-request refusal</td><td><strong>Team</strong></td><td>An unknown or hazardous part refuses the entire query instead of quietly classifying the parts it recognises.</td></tr>
+            <tr><td>Answer validation</td><td><strong>Team</strong></td><td>Rejects a model answer whose rule ID does not exist or whose category disagrees with the cited rule.</td></tr>
+            <tr><td>Source rendering</td><td><strong>Team</strong></td><td>The explanation and the link come from the server's rule record, never from the model.</td></tr>
+            <tr><td>Evaluation harness</td><td><strong>Team</strong></td><td>36 fixed catalog cases, 26 contract tests, and a serial live runner that stops after two failures.</td></tr>
+            <tr><td>Routes and static serving</td><td>FastAPI</td><td>HTTP endpoints and the built HTML, CSS and JavaScript.</td></tr>
+            <tr><td>Request and response schemas</td><td>Pydantic</td><td>Type checks, the 400-character limit and the eight-part limit.</td></tr>
+            <tr><td>Language interpretation</td><td>Bailian qwen3.8-flash</td><td>Maps a free-text description to rule IDs in AI mode. It never writes the bin category or the link.</td></tr>
+          </tbody>
+        </table>
+        <h3>Three decisions that came from the domain</h3>
+        <ul class="notes">
+          <li><strong>Beverage cartons are their own stream.</strong> HKU does not put a paper cup in Paper, so the app does not either. A clean cup returns R10, not R09.</li>
+          <li><strong>Food waste is withheld.</strong> No applicable local rule was verified, so the app refuses rather than guessing.</li>
+          <li><strong>"Not accepted" stays guide-specific.</strong> It means excluded by this guide, not "put it in general waste".</li>
+        </ul>
       </section>
+      <section id="boundary" aria-labelledby="boundary-title">
+        <h2 id="boundary-title">A case where it refuses</h2>
+        <p class="lead-para">The boundary we designed for is a query the guide cannot answer. <code>office paper + mystery object</code> names one supported item and one unsupported one. The easy behaviour is to classify the paper and ignore the rest. HallSort declines the whole request.</p>
+        <table class="rows">
+          <caption class="visually-hidden">Expected and observed behaviour for a partially supported query</caption>
+          <thead><tr><th scope="col">Query</th><th scope="col">Expected</th><th scope="col">Observed, live app</th></tr></thead>
+          <tbody>
+            <tr><td><code>office paper</code></td><td>Classified as Paper, R01</td><td>Paper, R01, HKU Recycling 101 poster</td></tr>
+            <tr><td><code>office paper + mystery object</code></td><td>Refused, zero parts, no bin assignment</td><td><code>status: refused</code>, <code>parts: []</code>, no bin</td></tr>
+            <tr><td><code>lithium battery</code></td><td>Refused by a local check, no model call</td><td>Refused, hazardous-waste message, no bin</td></tr>
+          </tbody>
+        </table>
+        <p class="cite">Recorded 19 November 2026 against the hosted instance. The refusal path is the reason the app can say "I do not know" without inventing an answer.</p>
+      </section>
+    </div>
+    <section class="band" aria-labelledby="runs-title">
+      <div class="wrap split-fig">
+        <figure>
+          <img src="run-catalog.png" alt="HallSort catalog result for a clean takeaway coffee cup set, showing three part cards for the lid, sleeve and cup with rule IDs R08, R09 and R10, each linking to the HKU Photo Guide." loading="lazy">
+          <figcaption>Captured from the hosted app on 19 November 2026 for the description <code>clean takeaway coffee cup set</code>.</figcaption>
+        </figure>
+        <div>
+          <h2 id="runs-title">A recorded run</h2>
+          <p class="band-lead">The app returns one card per separable part, each with the rule that decided it and the campus source behind it. The label above the result says which path produced it, so a catalog lookup is never presented as a model answer.</p>
+          <p class="band-lead">The same description in AI mode produced R10, R08 and R09 with the provider named in the label. AI mode needs a provider key on the server, and the public host has none, so the hosted app runs catalog mode only. The recording above shows the AI path working against the course provider on 25 October.</p>
+        </div>
+      </div>
+    </section>
+    <div class="wrap reading">
       <section id="evaluation" aria-labelledby="eval-title">
         <h2 id="eval-title">What we tested</h2>
-        <p>On November 19, the final Windows build passed 26 contract tests and all 36 fixed catalog cases. The live evaluation stopped after two unavailable responses. A direct provider check returned HTTP 403 with an access denial.</p>
-        <p>On October 25, the first live run produced 30 passes across 32 examples. A later run passed all 32. The live suite used AI-authored regression examples and included local refusals. Accuracy on unseen items remains unmeasured by these runs.</p>
+        <p>On 19 November, the final Windows build passed 26 contract tests and all 36 fixed catalog cases. The live evaluation stopped after two unavailable responses. A direct provider check returned HTTP 403 with an access denial.</p>
+        <p>On 25 October, the first live run produced 30 passes across 32 examples. A later run passed all 32. The live suite used AI-authored regression examples and included local refusals. Accuracy on unseen items remains unmeasured by these runs.</p>
         <ul class="links">
           <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/main/evidence/final_offline.md">Final Windows checks</a></li>
           <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/main/evidence/live_results_november_20261119_194843_641633.json">November live run</a></li>
           <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/00eba9dcfd05441b596b5752d6102607466a9144/evidence/live_results.json">First live run</a></li>
           <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/00eba9dcfd05441b596b5752d6102607466a9144/evidence/live_results_full_rerun.json">Full live rerun</a></li>
         </ul>
-        <h3>Run it locally</h3>
-        <p>Catalog mode runs without an API key. The repository includes setup instructions and commands to reproduce the checks.</p>
-        <a href="https://github.com/Isaiah-WU/ailt9019-hallsort#readme">Open setup instructions</a>
+      </section>
+      <section id="run" aria-labelledby="run-title">
+        <h2 id="run-title">Run it locally</h2>
+        <p>Catalog mode needs no API key and no network access after install. Python 3.12 or 3.13.</p>
+<pre><code>git clone https://github.com/Isaiah-WU/ailt9019-hallsort
+cd ailt9019-hallsort
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements-lock.txt
+.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8019</code></pre>
+        <p>Open <a href="http://127.0.0.1:8019">127.0.0.1:8019</a> and enter <code>clean takeaway coffee cup set</code>. Expect R08 Plastic, R09 Paper and R10 Beverage Cartons. Then enter <code>office paper + mystery object</code> and expect a refusal with no bin assignment.</p>
+<pre><code>.venv/bin/python -m pytest -q          # 26 passed
+.venv/bin/python evaluate.py           # 36/36 passed</code></pre>
+        <p>AI mode needs a provider key set on the server, never in the browser. The <a href="https://github.com/Isaiah-WU/ailt9019-hallsort#readme">README</a> covers Windows, the lockfile and the optional provider configuration.</p>
+        <p>This page and the app are two different artefacts. The app is catalog-only on the public host because no provider key is set there; AI mode is demonstrated in the recording above.</p>
       </section>
     </div>
+    <section class="team" aria-labelledby="team-title">
+      <div class="wrap">
+        <h2 id="team-title">Group 12</h2>
+        <ul class="people">
+          <li><strong>WU Hanlin</strong><span>Backend, rule catalog, citations</span></li>
+          <li><strong>WANG Leshen</strong><span>Example queries and expected outputs</span></li>
+          <li><strong>LUO Zihan</strong><span>Interface input handling, stale results</span></li>
+          <li><strong>YANG Andi</strong><span>Reproduction testing, defect logging, demo recording</span></li>
+        </ul>
+      </div>
+    </section>
   </main>
-  <footer><div class="wrap">HallSort · AILT9019 student project · Group 12</div></footer>
+  <footer><div class="wrap">HallSort · AILT9019 student project · Group 12 · <a href="https://github.com/Isaiah-WU/ailt9019-hallsort">Source</a></div></footer>
 </body>
 </html>

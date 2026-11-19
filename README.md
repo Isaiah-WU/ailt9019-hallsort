@@ -1,104 +1,79 @@
 # HallSort
 
-An AILT9019 prototype that checks everyday items against a small, traceable catalog of HKU **re Kiosk** recycling rules. FastAPI serves a buildless HTML/CSS/JS interface. No database or login is required.
+HallSort helps an HKU student decide how to separate an item at the **re Kiosk**. A clean takeaway coffee set, for example, yields a plastic lid (R08), paper sleeve (R09) and paper cup for the beverage-carton stream (R10). Each part links to the campus guidance used for that decision.
 
-## Current state
+**[Project page](https://isaiah-wu.github.io/ailt9019-hallsort/) · [Source rules](rules.json) · [Final Windows verification](evidence/final_offline.md)**
 
-- Working local path: browser input → catalog lookup → rule/category validation → per-part results with official source links.
-- Optional AI path: sends the query and the complete rule file to an OpenAI-compatible Chat Completions API, then validates the returned structure, rule IDs and categories. The course-sponsored Alibaba Cloud Bailian `qwen3.8-flash` connection has been verified. See `evidence/live_results.json` for the first serial acceptance run and `evidence/live_results_full_rerun.json` for the full suite after the rule-ID fix. Mocked transport tests remain separate from live evaluation.
-- Catalog mode does not call a model, simulate a model, or replay model answers. It only matches explicitly supported names. Unknown components cause refusal of the whole request.
-- This package was AI-generated on 25 October 2026. Team members must review it, run it themselves and describe their actual contributions honestly.
+## Run HallSort
 
-## Setup and run
+Use Python 3.12 or 3.13. On Windows, run the following from PowerShell in the repository:
 
-Requires Python 3.12 or 3.13 and an internet connection to install dependencies. Tested on Windows with Python 3.12 and independently rerun on macOS with Python 3.12.13 and 3.13.12. In this folder:
+```powershell
+.\start.ps1
+```
 
-```bash
+The launcher creates the virtual environment if needed and installs the runtime requirements on each launch, including after an interrupted install. For an installation with the exact versions used in verification, or if the launcher is unavailable:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-lock.txt
+.\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8019
+```
+
+On macOS or Linux:
+
+```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements-lock.txt
 .venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8019
 ```
 
-On Windows PowerShell use `python` instead of `python3` and `.\.venv\Scripts\python.exe` instead of `.venv/bin/python`, or run `.\start.ps1`, which creates the environment on first use and then serves.
+Open [HallSort locally](http://127.0.0.1:8019). Use **Catalog** and try `clean takeaway coffee cup set`. Then try `office paper + mystery object`. An unknown part makes the whole request decline classification. Catalog runs without an API key. The [public project page](https://isaiah-wu.github.io/ailt9019-hallsort/) includes a recorded demonstration.
 
-`requirements.txt` pins the direct dependencies. `requirements-lock.txt` pins the full transitive set that produced the recorded results; use `-r requirements-lock.txt` instead of `requirements.txt` when exact versions matter.
+## How it works
 
-Open http://127.0.0.1:8019.
+- **Catalog** matches known names and aliases in 17 entries against 16 source-linked rules. Enter up to 400 characters and separate items with `+` or `;`. A query can return up to eight parts.
+- **AI interpretation** sends eligible item descriptions and the rule set to the configured provider. FastAPI validates the JSON structure, part count, rule IDs and matching categories. Reasons and links come from the server's rule file. The model can still choose a valid rule for the wrong item.
+- **Result labels** show when a local check decided the result, when the app attempted a provider call and when classification was unavailable. Hazardous items, some contaminated items and instructions to override signs can be refused locally. Provider errors return an empty result with guidance.
 
-Try `clean takeaway coffee cup set`. Expected three results, in order:
+### Optional AI configuration
 
-| Part | Category | Rule |
-|---|---|---|
-| clean coffee cup lid | Plastic | R08 |
-| coffee cup sleeve | Paper | R09 |
-| clean paper coffee cup | Beverage Cartons | R10 |
+Set `BAILIAN_API_KEY` in the server environment for an authorized Alibaba Cloud Bailian account. The project used `qwen3.8-flash` at the fixed course endpoint. With no Bailian key, the optional OpenAI configuration uses `OPENAI_API_KEY` and `OPENAI_MODEL` (default `gpt-4o-mini`). Restart after changing the environment and select AI mode to send a query. Keep keys out of the browser, repository and recordings. Item text goes to the selected provider, so enter item descriptions only.
 
-The source for each is the [HKU Photo Guide](https://www.wastereduction.hku.hk/photo-guide). Try `lithium battery`: it must explicitly refuse and show no bin assignment. Try `office paper + mystery object`: it must refuse rather than silently classify only the known part.
+On **19 November 2026**, the sponsored endpoint returned HTTP 403 (`AccessDenied.Unpurchased`). Catalog mode remains usable. A successful live run requires an account with active model access. Run one worker for the shared quota. The app serializes calls, waits up to 5 seconds for a slot, and limits a model attempt to 50 seconds with an 8-second connection timeout and 45-second read timeout. It does not automatically retry a paid request.
 
-## Enable AI mode
+## Reproduce the checks
 
-For the course provider, set `BAILIAN_API_KEY` on the server; `BAILIAN_MODEL` defaults to `qwen3.8-flash`. The server uses the fixed course endpoint `https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/chat/completions`. The key is not included in this source package.
+After installing `requirements-lock.txt`, run the commands below in the repository. On Windows, use `.\.venv\Scripts\python.exe` in place of `.venv/bin/python`.
 
-Without a Bailian key, the alternative OpenAI provider reads `OPENAI_API_KEY` from its environment. Set it in your own terminal before starting the server. Never put the key in the HTML, source code, repository, status sheet or video. `OPENAI_MODEL` defaults to `gpt-4o-mini` and can be configured for an account that has access to another compatible Chat Completions model supporting JSON mode. Restart the server after changing its environment.
-
-API requests go only to the fixed Bailian endpoint above, or `https://api.openai.com/v1/chat/completions` for the alternative OpenAI configuration. The frontend cannot change these destinations. Requests are serialized in each server process; run one server worker only for the shared course quota. There is no automatic paid API call at startup. Only explicitly selecting AI mode and submitting an item makes a call. User-entered item text is sent to the provider shown in the mode selector. Do not enter personal data.
-
-AI mode fails visibly if the key is absent, the service fails, JSON is malformed, a rule is missing or the category disagrees with the cited rule. It does not silently switch to catalog mode. Keys remain server-side. The proposal's shared demo key should be implemented as a server-managed credential, never as a key distributed in the client.
-
-The course [Ed announcement](https://edstem.org/au/courses/40809/discussion/3657906) explicitly permits course-app integration with the sponsored Team Edition, gives 25,000 credits per group, recommends Flash models, and prohibits excessive concurrency. This batch expires on 19 November 2026. These course-specific conditions do not establish permission to run an unrelated production service on a generic Token Plan.
-
-Reference: [OpenAI Chat Completions API](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create).
-
-## Verify
-
-```bash
-.venv/bin/python -m pip install -r requirements-dev.txt
+```sh
 .venv/bin/python -m pytest -q
 .venv/bin/python evaluate.py
 ```
 
-On Windows PowerShell, replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`. Expected output is `20 passed, 1 warning` and `Catalog regression: 36/36 passed.` The warning is a `StarletteDeprecationWarning` about `httpx` inside `starlette.testclient` and does not affect any result.
+| Date and scope | Observed result | Evidence |
+| --- | --- | --- |
+| 19 Nov · Windows 11, Python 3.13.5 | 26/26 contract tests. 36/36 catalog cases. Launcher recovered after a missing dependency. | [Verification](evidence/final_offline.md) · [catalog outputs](evidence/catalog_results_20261119_195009_668292.json) |
+| 25 Oct · original live suite | 30/32. Two requests returned unavailable. | [First run](evidence/live_results.json) |
+| 25 Oct · targeted and full live reruns | 2/2 targeted, then 32/32 on the original suite. | [Targeted](evidence/live_targeted_rerun.json) · [full rerun](evidence/live_results_full_rerun.json) |
+| 19 Nov · new English and Chinese suite | 32 planned. The first two requests returned unavailable. The runner stopped and the other 30 were unexecuted. | [Fixed cases](tests/november_cases.json) · [partial run](evidence/live_results_november_20261119_194843_641633.json) · [access check](evidence/final_scope.md) |
 
-`tests/cases.json` contains 36 expected-result regression cases fixed before the run. `evaluate.py` writes inputs, expected/actual outputs, timestamps and source hashes to `evidence/catalog_results.json`. These curated examples are not an independent accuracy benchmark. Unit/contract tests exercise invalid citations, category mismatch, request bounds, part-count limits, missing keys and mocked API failures. A mocked API test does not establish model accuracy or access.
+The October failures were L17 (unpadded rule ID) and L32 (cause unresolved, later model output differed). The suite checks the status and rule IDs for prewritten cases. An AI assistant drafted both live suites. Refusal counts include local checks. The experiments do not establish performance on an independent human sample.
 
-Before claiming the proposal's >=80% classification target or 100% refusal target for a real model, team members must create an independent 30–40-item evaluation set, write expected answers from sources before execution, run AI mode, check semantic rule support and retain complete failures as well as passes.
+With authorized provider access and the server running on port 8019, explicitly opt in to the paid serial tests:
 
-## Knowledge and scope
+```sh
+.venv/bin/python evaluate_live.py --run --suite november
+```
 
-`rules.json` contains 16 unique rule IDs, their categories, concise rule text, official source URLs and supported catalog aliases. Sources reviewed on 25 October 2026:
+Use `--suite october` to reproduce the earlier set or `--cases N01` with the November set to select one case. The evaluator bypasses environment proxies for loopback requests, saves a timestamped result after each response, and stops after two consecutive unavailable responses. See the [October clean macOS installation record](evidence/install_reproduction_yang.md) for the earlier revision.
 
-- [HKU Recycling 101](https://www.wastereduction.hku.hk/recycling-101) and its linked [poster](https://www.wastereduction.hku.hk/_files/ugd/bccd45_652bab3854994da9a05b96ed09580df4.pdf).
-- [HKU Photo Guide](https://www.wastereduction.hku.hk/photo-guide).
-- [HKU collection facilities](https://www.wastereduction.hku.hk/re-facilities) establish that collection categories vary by location.
+## Rule sources and scope
 
-Changes from the proposal: beverage cartons are a distinct collection stream; unaccepted items are not automatically assigned to General Waste; Food Waste is withheld because no applicable local rule was verified. The specific hall's signage still needs checking. These are explicit scope corrections, not claims that all halls have identical bins.
+The [HKU Photo Guide](https://www.wastereduction.hku.hk/photo-guide), [Recycling 101](https://www.wastereduction.hku.hk/recycling-101) and [facility directory](https://www.wastereduction.hku.hk/re-facilities) document the kiosk and its collection streams. The rule file links individual decisions to the corresponding guide or poster. The [November source review](evidence/final_scope.md) records the distinction between a kiosk and a specific hall's facilities.
 
-Known limits:
+HallSort accepts a text description. It cannot inspect an item's cleanliness or a collection point's current signage. Food waste, hazardous disposal instructions, image inputs and hall-specific routing are outside the verified scope. Follow posted instructions at the collection point. Run the application on loopback. The public site hosts project information and a video.
 
-1. Catalog mode matches only known aliases, with `+` or `;` separators; it has no general natural-language understanding.
-2. Rule ID/category validation cannot prove that an LLM selected the semantically correct rule. Adversarial, ambiguous and multilingual cases need further human evaluation. Keyword screening is conservative and incomplete.
-3. The catalog assumes the stated item/material/condition is accurate. It cannot inspect physical contamination, composite materials or the availability of a collection point.
-4. Hazardous/electronic waste, food waste, image uploads and hall-specific routing are outside the current verified scope. “Not accepted” is not a hazardous-waste disposal instruction.
-5. Bind to loopback only. Public deployment would require authentication, abuse controls and API-cost limits, which are not implemented here.
+## Project credits
 
-## Midterm handoff
-
-The course requires a <=60-second MP4, `repository_link.txt` and the one-page status sheet inside a ZIP <=100 MB. A 57-second 1080p demo is included at `submission/hallsort-demo.mp4`. Repository: https://github.com/Isaiah-WU/ailt9019-hallsort (private). Course-team access still needs to be granted and verified. Uploading this source archive alone does not satisfy the submission requirement.
-
-The user reported no prior implementation work and subsequently supplied the group API credentials and setup information. No other member's completed contribution has been confirmed. Each member should complete a specific review, test, documentation or implementation task and record it accurately before finalizing the status sheet. No Moodle submission has been made.
-
-Live acceptance history, all with `qwen3.8-flash`:
-
-| Run | Time (HKT) | Result |
-|---|---|---|
-| First full suite | 25 Oct 00:52 | 30/32 (19/20 classification, 11/12 refusal) |
-| Targeted rerun of L17 and L32 | 25 Oct 00:58 | 2/2 |
-| Full suite after the rule-ID fix | 25 Oct 18:01 | 32/32 (20 classification, 12 refusal) |
-
-Both non-passes in the first run returned `unavailable` with no bin assignment, so they were missing verifiable answers rather than wrong classifications. L17 is explained by unpadded rule IDs; the fix now accepts R1–R9 only when the canonical R01–R09 rule exists and the bin matches. L32 is not explained by that fix: the refusal path never reads a rule ID, and its targeted rerun recorded a different model response. The 32/32 result is a single run of the same AI-authored suite at temperature 0, not independent validation, and it does not support an accuracy claim beyond what this section already says. Current unit tests: 20/20; catalog cases: 36/36; both independently rerun on macOS with identical source hashes. All three live records and their source hashes are retained.
-
-Screenshots of catalog mode and live AI mode are in `evidence/browser_coffee_set.png` and `evidence/browser_live_result.png`. The install and documentation check, including the environment it was run in, is in `evidence/install_reproduction_yang.md`.
-
-## Live acceptance test
-
-Start the server with a provider key on `127.0.0.1:8019` (the script hardcodes that address), then run `.venv/bin/python evaluate_live.py --run`. This explicitly consumes quota, executes 32 cases serially with a one-second gap, and stops after two consecutive `unavailable` responses. If `HTTP_PROXY` is set in your shell, `httpx` proxies the localhost calls too and the script cannot connect; prefix the command with `NO_PROXY=127.0.0.1`. Expectations were written before execution; this is an AI-authored acceptance suite and still requires independent team review. The reported refusals include local guard refusals and must not be described as a stand-alone model safety score. Read complete actual outputs and source hashes in `evidence/live_results.json`.
+AILT9019 Group 12 developed HallSort with AI assistance for implementation, evaluation cases, documentation and final verification. The repository retains observed outcomes and the scope of each run. The October [walkthrough](submission/hallsort-demo.mp4) shows the original interface and a real provider response from that date.

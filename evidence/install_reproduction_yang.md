@@ -84,7 +84,7 @@ Identical source hashes mean `main.py`, `rules.json` and `tests/cases.json` have
 
 ## 5. Live model, executed with the group key
 
-The group key was supplied on 25 October and placed in `/Users/andi/Documents/ailt9019/.env`, outside the repository. It reached the server as an environment variable, never on a command line, never in a tracked file, and never in any captured output. The application reads `BAILIAN_API_KEY`; a variable named only `API_KEY` is not read by the code, so it was mapped at launch.
+The group key was supplied on 25 October and placed in `[private directory omitted]/.env`, outside the repository. It reached the server as an environment variable, never on a command line, never in a tracked file, and never in any captured output. The application reads `BAILIAN_API_KEY`; a variable named only `API_KEY` is not read by the code, so it was mapped at launch.
 
 Three spot queries before the suite:
 
@@ -117,7 +117,7 @@ Severity is about what a marker or TA would hit, not about code quality.
 | D5 | Low | README says the live script "stops after two unavailable responses"; the counter resets after each successful call, so it stops after two consecutive ones. | Add "consecutive". |
 | D6 | Low | The live-test section says `python evaluate_live.py --run`, but the dependencies live in `.venv`, and the script hardcodes `127.0.0.1:8019` without the README saying the server must listen there. | Use the venv interpreter and state the fixed address. |
 | D7 | Low | `evidence/browser_*.png` are JPEG data, not PNG. They open correctly in browsers and viewers, but the extension is wrong. | Rename to `.jpg` or re-encode. Cosmetic only; no functional impact. |
-| D8 | Low | `evidence/unit_tests.txt` is the only test log and contains the author's local path `C:\Users\hanli\...`. | Add a macOS log; the path is a minor local-path disclosure. |
+| D8 | Low | `evidence/unit_tests.txt` is the only test log and contains the author's local path `[local project path omitted]`. | Add a macOS log; the path is a minor local-path disclosure. |
 | D9 | Low | `httpx` honours `HTTP_PROXY`. On a machine with proxy environment variables set, calls to `127.0.0.1` are proxied and `evaluate_live.py` fails with connection errors. Reproduced here. | Document `NO_PROXY=127.0.0.1`, or pass `trust_env=False` in the client. |
 | D10 | Medium (accuracy) | The verify section lists "multipart limits" among the tested behaviours. The API accepts JSON only; `main.py` has no multipart handling and `tests/test_contracts.py` has no multipart case. | Remove the claim, or add a real test. |
 | D11 | Low | `start.ps1` installs dependencies only when `.venv\Scripts\python.exe` is absent. A venv left behind by a failed `pip install`, or one created before a dependency change, is reused without reinstalling and the server then fails with `ModuleNotFoundError`. Not observed on Windows, inferred from the script. | Reinstall when `requirements.txt` is newer than the venv, or always run `pip install` (it is idempotent). |
@@ -156,3 +156,5 @@ python3 -m venv .venv && .venv/bin/python -m pip install -r requirements-lock.tx
 `requirements-lock.txt` already includes `pytest`, so no separate dev install is needed.
 
 Before signing the status sheet, rerun these four commands and confirm the two expected lines. Do not record this check as your own contribution unless you have done so.
+
+Final packaging note, 19 November 2026: the two screenshots now use PNG encoding. Private machine paths in this record and the historical Windows test log were replaced with bracketed placeholders. The October test outcomes are unchanged.

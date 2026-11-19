@@ -19,6 +19,8 @@ assert len(RULES) == len(DATA['rules']), 'Duplicate rule IDs'
 NOTICE = 'Educational prototype. These rules describe HKU re Kiosk, not every hall bin. Posted signage and staff instructions take precedence.'
 app = FastAPI(title='HallSort', version='0.1.0')
 MODEL_LOCK = asyncio.Semaphore(1)
+QUEUE_TIMEOUT_SECONDS = 5
+MODEL_DEADLINE_SECONDS = 50
 app.mount('/static', StaticFiles(directory=ROOT / 'static'), name='static')
 
 
@@ -45,9 +47,9 @@ def norm(value):
     return re.sub(r'\s+', ' ', value.strip().lower()).rstrip('.!?')
 
 
-def refuse(message, mode, status='refused'):
+def refuse(message, mode, status='refused', *, model_attempted=False):
     return dict(status=status, mode=mode, message=message, parts=[], notice=NOTICE,
-                rule_version=DATA['version'])
+                rule_version=DATA['version'], model_attempted=model_attempted)
 
 
 def guard(query):
@@ -119,7 +121,8 @@ async def call_model(query, key):
         'or {"status":"refused","parts":[]}. Maximum eight parts. Never invent rules. Full rule file: '
         + json.dumps(DATA['rules'], ensure_ascii=False)
     )
-    async with httpx.AsyncClient(timeout=25.0, follow_redirects=False) as client:
+    timeout = httpx.Timeout(45.0, connect=8.0, write=8.0, pool=5.0)
+    async with httpx.AsyncClient(timeout=timeout, follow_redirects=False) as client:
         response = await client.post(provider_config()[1],
             headers={'Authorization': 'Bearer ' + key},
             json={'model': provider_config()[3],
@@ -158,12 +161,32 @@ async def classify(body: Query):
     if blocked:
         return refuse(blocked, body.mode)
     if body.mode == 'catalog':
-        return catalog(query)
+        return {**catalog(query), 'model_attempted': False}
     key = provider_config()[2]
     if not key:
         return refuse('AI mode is not configured. The project owner must set a supported provider key on the server. Catalog mode is available without a key.', 'llm', 'unavailable')
     try:
-        async with MODEL_LOCK:
-            return validate_answer(await call_model(query, key), 'llm')
+        await asyncio.wait_for(MODEL_LOCK.acquire(), timeout=QUEUE_TIMEOUT_SECONDS)
+    except TimeoutError:
+        return refuse('Another AI request is still running. Try again later or choose catalog mode.', 'llm', 'unavailable')
+    try:
+        async with asyncio.timeout(MODEL_DEADLINE_SECONDS):
+            raw = await call_model(query, key)
+        return {**validate_answer(raw, 'llm'), 'model_attempted': True}
+    except (TimeoutError, httpx.TimeoutException):
+        return refuse('The model provider did not respond in time. Try again later or choose catalog mode.', 'llm', 'unavailable', model_attempted=True)
+    except httpx.HTTPStatusError as error:
+        status = error.response.status_code
+        if status == 401:
+            message = 'The model provider could not authenticate the configured credential. The project owner should check it. Catalog mode is available.'
+        elif status == 403:
+            message = 'The model provider denied access. The project owner should check the account plan and model permissions. Catalog mode is available.'
+        elif status == 429:
+            message = 'The model provider reported a rate or quota limit. Try later or ask the project owner to check the quota. Catalog mode is available.'
+        else:
+            message = 'The model provider returned an error. Try again later or choose catalog mode.'
+        return refuse(message, 'llm', 'unavailable', model_attempted=True)
     except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError):
-        return refuse('The AI service failed or returned an answer that could not be verified. No classification is shown. Try catalog mode or check the official guide.', 'llm', 'unavailable')
+        return refuse('The AI service failed or returned an answer that could not be verified. No classification is shown. Try catalog mode or check the official guide.', 'llm', 'unavailable', model_attempted=True)
+    finally:
+        MODEL_LOCK.release()

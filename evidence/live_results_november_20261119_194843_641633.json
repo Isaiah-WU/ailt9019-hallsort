@@ -1,0 +1,54 @@
+{
+  "date": "2026-11-19T19:48:49.203633+08:00",
+  "provider": "Alibaba Cloud Bailian",
+  "model": "qwen3.8-flash",
+  "planned": 32,
+  "completed": 2,
+  "passed": 0,
+  "note": "AI-authored small acceptance suite, expected results fixed before running. Not independent team validation or broad accuracy.",
+  "source_hashes": {
+    "main.py": "6165360bbfa100527a4312875639c66d7ee6a638504edb9994927cebe92a587b",
+    "rules.json": "401442f74f06bae8af181a01c1680703877c92713e787698c8832690ea7ef02e",
+    "tests/november_cases.json": "56ee680575dc71345c1659096def99293b86c2dfd40c05ccf4eee311f6a80078"
+  },
+  "cases": [
+    {
+      "id": "N01",
+      "query": "從影印機取出的乾燥 A4 廢紙，沒有膠貼。",
+      "status": "classified",
+      "rule_ids": [
+        "R01"
+      ],
+      "passed": false,
+      "seconds": 2.17,
+      "actual": {
+        "status": "unavailable",
+        "mode": "llm",
+        "message": "The AI service failed or returned an answer that could not be verified. No classification is shown. Try catalog mode or check the official guide.",
+        "parts": [],
+        "notice": "Educational prototype. These rules describe HKU re Kiosk, not every hall bin. Posted signage and staff instructions take precedence.",
+        "rule_version": "2026-10-25.1",
+        "model_attempted": true
+      }
+    },
+    {
+      "id": "N02",
+      "query": "A moving box is empty, dry and made of clean corrugated cardboard.",
+      "status": "classified",
+      "rule_ids": [
+        "R02"
+      ],
+      "passed": false,
+      "seconds": 2.33,
+      "actual": {
+        "status": "unavailable",
+        "mode": "llm",
+        "message": "The AI service failed or returned an answer that could not be verified. No classification is shown. Try catalog mode or check the official guide.",
+        "parts": [],
+        "notice": "Educational prototype. These rules describe HKU re Kiosk, not every hall bin. Posted signage and staff instructions take precedence.",
+        "rule_version": "2026-10-25.1",
+        "model_attempted": true
+      }
+    }
+  ]
+}

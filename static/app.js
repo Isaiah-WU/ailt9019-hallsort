@@ -2,9 +2,30 @@ let providerName='the configured model provider';
 let latestCheckId = 0;
 const form=document.querySelector('#check-form'), input=document.querySelector('#item'), mode=document.querySelector('#mode'), results=document.querySelector('#results'), submit=document.querySelector('#submit');
 function el(tag,text,cls){const n=document.createElement(tag);n.textContent=text;if(cls)n.className=cls;return n}
-document.querySelectorAll('[data-query]').forEach(b=>b.addEventListener('click',()=>{input.value=b.dataset.query;input.focus()}));
-mode.addEventListener('change',()=>{document.querySelector('#mode-note').textContent=mode.value==='catalog'?'Catalog mode matches listed names exactly. Join separate items with +.':'AI mode sends your item description to '+providerName+'. Avoid personal information. An API key must be set on the server.'});
-fetch('/api/info').then(r=>r.json()).then(data=>{providerName=data.provider;document.querySelector('#version').textContent='Rules '+data.rule_version;if(data.llm_available){mode.options[1].textContent='AI interpretation · '+data.provider+' / '+data.model;mode.value='llm';mode.dispatchEvent(new Event('change'));}data.examples.forEach(x=>{const li=el('li',x);document.querySelector('#catalog').append(li)});if(!data.llm_available)mode.options[1].textContent='AI interpretation · not configured yet'}).catch(()=>{document.querySelector('#version').textContent='Server unavailable'});
+document.querySelectorAll('[data-query]').forEach(button => {
+    button.addEventListener('click', () => {
+        input.value = button.dataset.query;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.focus();
+    });
+});
+function updateModeNote() {
+    document.querySelector('#mode-note').textContent = mode.value === 'catalog'
+        ? 'Catalog mode matches listed names exactly. Join separate items with +.'
+        : 'AI mode sends your item description to ' + providerName + '. Avoid personal information.';
+}
+mode.addEventListener('change', updateModeNote);
+fetch('/api/info').then(response => response.json()).then(data => {
+    providerName = data.provider;
+    document.querySelector('#version').textContent = 'Rules ' + data.rule_version;
+    mode.options[1].textContent = data.llm_available
+        ? 'AI interpretation · ' + data.provider + ' / ' + data.model
+        : 'AI interpretation · not configured yet';
+    updateModeNote();
+    data.examples.forEach(example => document.querySelector('#catalog').append(el('li', example)));
+}).catch(() => {
+    document.querySelector('#version').textContent = 'Server unavailable';
+});
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -61,13 +82,18 @@ form.addEventListener('submit', async (e) => {
             heading = 'Let’s check before guessing.';
         }
 
+        let sourceLabel = 'VERIFIED CATALOG · NO MODEL CALL';
+        if (data.mode === 'llm') {
+            if (!data.model_attempted) {
+                sourceLabel = 'LOCAL CHECK · NO MODEL CALL';
+            } else if (data.status === 'unavailable') {
+                sourceLabel = 'PROVIDER REQUEST · NO VERIFIED ANSWER';
+            } else {
+                sourceLabel = 'AI INTERPRETATION';
+            }
+        }
         results.replaceChildren(
-            el('p',
-                data.mode === 'catalog'
-                    ? 'VERIFIED CATALOG · NO MODEL CALL'
-                    : 'AI INTERPRETATION',
-                'result-mode'
-            ),
+            el('p', sourceLabel, 'result-mode'),
             el('h2', heading, 'result-title'),
             el('p', data.message, 'result-msg')
         );
@@ -143,9 +169,6 @@ input.addEventListener('input', showReadyState);
 
 mode.addEventListener('change', showReadyState);
 
-document.querySelectorAll('[data-query]').forEach(button => {
-  button.addEventListener('click', showReadyState);
-});
 
 
 document.querySelector('#clear-input').addEventListener('click', () => {
@@ -168,9 +191,6 @@ function invalidatePendingCheck() {
 input.addEventListener('input', invalidatePendingCheck);
 mode.addEventListener('change', invalidatePendingCheck);
 
-document.querySelectorAll('[data-query]').forEach(button => {
-  button.addEventListener('click', invalidatePendingCheck);
-});
 
 
 const inputFeedback = document.querySelector('#input-feedback');

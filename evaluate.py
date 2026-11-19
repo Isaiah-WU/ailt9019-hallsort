@@ -3,7 +3,6 @@ import hashlib
 import json
 from pathlib import Path
 from datetime import datetime
-from zoneinfo import ZoneInfo
 from fastapi.testclient import TestClient
 from main import app
 
@@ -22,6 +21,8 @@ result=dict(date=datetime.now().astimezone().isoformat(),mode='catalog',live_llm
             description='Curated regression cases with expected results fixed before this run; not independent or representative accuracy.',
             total=len(rows),passed=sum(r['passed'] for r in rows),
             source_hashes={name:hashlib.sha256((root/name).read_bytes()).hexdigest() for name in ['main.py','rules.json','tests/cases.json']},cases=rows)
-(out/'catalog_results.json').write_text(json.dumps(result,indent=2,ensure_ascii=False),encoding='utf-8')
+record = out/f"catalog_results_{datetime.now():%Y%m%d_%H%M%S_%f}.json"
+record.write_text(json.dumps(result,indent=2,ensure_ascii=False),encoding='utf-8')
+print(f"Saved {record.name}")
 print(f"Catalog regression: {result['passed']}/{result['total']} passed. Live LLM: not tested.")
 raise SystemExit(0 if result['passed']==result['total'] else 1)

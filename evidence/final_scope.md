@@ -1,0 +1,9 @@
+# Final scope and provider access check
+
+Reviewed on 19 November 2026 (Hong Kong time).
+
+The [HKU Photo Guide](https://www.wastereduction.hku.hk/photo-guide) lists the plastic lid, paper sleeve and beverage-carton collection stream for a clean takeaway coffee cup. It also distinguishes recyclable foam nets from unaccepted baking paper and foil-lined snack wrapping. The [HKU facility directory](https://www.wastereduction.hku.hk/re-facilities) identifies the re Kiosk at Run Run Shaw Podium and separately describes smart bins with location-specific exceptions. These examples were checked against the rule catalog online. This review did not inspect signs in any hall. Users should follow local signs for the actual collection point.
+
+The [November suite](../tests/november_cases.json) contains 20 expected classifications and 12 expected refusals in English and Chinese. An AI assistant wrote the inputs and expected rule IDs before execution. A serial call through the running local service returned unavailable for N01 and N02. The evaluator stopped as configured. [Both observed outputs](live_results_november_20261119_194843_641633.json) are retained with their source hashes. A single diagnostic request using the same project configuration to the course provider returned HTTP 403 and the provider code `AccessDenied.Unpurchased`. No successful November model completion was observed. The two requests provide evidence about service access, not classification quality for the 30 unexecuted cases.
+
+The final application distinguishes provider authentication or access errors, rate or quota errors, timeouts, local refusals, and successful provider responses. See the [final local verification](final_offline.md) for the checks run after updating those messages. To repeat the live evaluation, first obtain active course-authorized access and then use the opt-in command in the README.

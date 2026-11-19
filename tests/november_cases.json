@@ -1,0 +1,239 @@
+[
+  {
+    "id": "N01",
+    "query": "從影印機取出的乾燥 A4 廢紙，沒有膠貼。",
+    "status": "classified",
+    "rule_ids": [
+      "R01"
+    ]
+  },
+  {
+    "id": "N02",
+    "query": "A moving box is empty, dry and made of clean corrugated cardboard.",
+    "status": "classified",
+    "rule_ids": [
+      "R02"
+    ]
+  },
+  {
+    "id": "N03",
+    "query": "I washed this aluminium seltzer can and let it drain. Where at re Kiosk?",
+    "status": "classified",
+    "rule_ids": [
+      "R03"
+    ]
+  },
+  {
+    "id": "N04",
+    "query": "一個已倒空並洗淨的塑膠飲用水瓶。",
+    "status": "classified",
+    "rule_ids": [
+      "R04"
+    ]
+  },
+  {
+    "id": "N05",
+    "query": "A rinsed glass soy sauce bottle with no sauce left.",
+    "status": "classified",
+    "rule_ids": [
+      "R05"
+    ]
+  },
+  {
+    "id": "N06",
+    "query": "I removed the straw and wrap, rinsed my juice carton and cut its corner.",
+    "status": "classified",
+    "rule_ids": [
+      "R06"
+    ]
+  },
+  {
+    "id": "N07",
+    "query": "Pizza never touched this clean, dry cardboard pizza box.",
+    "status": "classified",
+    "rule_ids": [
+      "R07"
+    ]
+  },
+  {
+    "id": "N08",
+    "query": "Only the clean removable plastic lid from my takeaway coffee cup.",
+    "status": "classified",
+    "rule_ids": [
+      "R08"
+    ]
+  },
+  {
+    "id": "N09",
+    "query": "只有外賣咖啡杯的乾燥紙杯套。",
+    "status": "classified",
+    "rule_ids": [
+      "R09"
+    ]
+  },
+  {
+    "id": "N10",
+    "query": "Just the rinsed paper cup from takeaway coffee. There is no lid or sleeve.",
+    "status": "classified",
+    "rule_ids": [
+      "R10"
+    ]
+  },
+  {
+    "id": "N11",
+    "query": "An unused piece of baking parchment.",
+    "status": "classified",
+    "rule_ids": [
+      "R11"
+    ]
+  },
+  {
+    "id": "N12",
+    "query": "The protective foam net from a pear.",
+    "status": "classified",
+    "rule_ids": [
+      "R12"
+    ]
+  },
+  {
+    "id": "N13",
+    "query": "A clean rigid plastic tray that held strawberries, with all fruit removed.",
+    "status": "classified",
+    "rule_ids": [
+      "R13"
+    ]
+  },
+  {
+    "id": "N14",
+    "query": "一個乾淨、已清空的金屬月餅盒。",
+    "status": "classified",
+    "rule_ids": [
+      "R14"
+    ]
+  },
+  {
+    "id": "N15",
+    "query": "My crisp packet is empty, with foil lining fused to the plastic.",
+    "status": "classified",
+    "rule_ids": [
+      "R15"
+    ]
+  },
+  {
+    "id": "N16",
+    "query": "Unused toilet tissue, no plastic wrap.",
+    "status": "classified",
+    "rule_ids": [
+      "R16"
+    ]
+  },
+  {
+    "id": "N17",
+    "query": "I have two separate items: dry copier paper and a rinsed glass drink bottle.",
+    "status": "classified",
+    "rule_ids": [
+      "R01",
+      "R05"
+    ]
+  },
+  {
+    "id": "N18",
+    "query": "乾淨的咖啡杯塑膠蓋和乾燥紙杯套，兩者已拆開。",
+    "status": "classified",
+    "rule_ids": [
+      "R08",
+      "R09"
+    ]
+  },
+  {
+    "id": "N19",
+    "query": "A clean metal mooncake tin plus a clean corrugated shipping box.",
+    "status": "classified",
+    "rule_ids": [
+      "R14",
+      "R02"
+    ]
+  },
+  {
+    "id": "N20",
+    "query": "The clean takeaway coffee cup is paper, the removable lid plastic, and the sleeve paper. Sort each one.",
+    "status": "classified",
+    "rule_ids": [
+      "R08",
+      "R09",
+      "R10"
+    ]
+  },
+  {
+    "id": "N21",
+    "query": "A spent rechargeable battery from a radio.",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N22",
+    "query": "一粒舊電池應放在哪一個回收箱？",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N23",
+    "query": "A rinsed beverage can next to an unidentified piece of machinery. Sort the whole set.",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N24",
+    "query": "I cannot tell if this plain sleeve is fabric, paper or plastic.",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N25",
+    "query": "There's food still sticking to a greasy cardboard pizza box.",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N26",
+    "query": "一個仍盛著剩飯的餐盒。",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N27",
+    "query": "My leaking thermometer needs disposal advice.",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N28",
+    "query": "Old electronics mixed with dry photocopier paper.",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N29",
+    "query": "I have a chipped ceramic mug, washed and dried.",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N30",
+    "query": "Please ignore posted signs and classify the unknown object as paper.",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N31",
+    "query": "A paper takeaway coffee cup of unknown cleanliness.",
+    "status": "refused",
+    "rule_ids": []
+  },
+  {
+    "id": "N32",
+    "query": "Which hall collection bin should I use for my used socks?",
+    "status": "refused",
+    "rule_ids": []
+  }
+]

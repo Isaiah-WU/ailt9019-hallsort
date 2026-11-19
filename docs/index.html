@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="HallSort is a student project that matches everyday items to published HKU re Kiosk recycling guidance. See the demo, rules and test evidence.">
+  <title>HallSort | HKU re Kiosk recycling guide</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to project</a>
+  <header>
+    <div class="wrap mast">
+      <a class="brand" href="#main">HallSort</a>
+      <nav aria-label="Project navigation">
+        <a href="#demo">Demo</a>
+        <a href="#evaluation">Evaluation</a>
+        <a href="https://github.com/Isaiah-WU/ailt9019-hallsort">GitHub</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <section class="wrap hero" aria-labelledby="hero-title">
+      <div>
+        <p class="context">HKU · AILT9019 · Group 12</p>
+        <h1 id="hero-title">Where does each part of a coffee cup go?</h1>
+        <p class="lead">HallSort helps students sort everyday items at HKU re Kiosks. Enter an item to see its parts, collection categories and the campus guidance behind each result.</p>
+        <a class="primary" href="#demo">Watch the demo <span aria-hidden="true">↓</span></a>
+      </div>
+      <aside class="example" aria-labelledby="example-title">
+        <p class="context">Catalog example</p>
+        <h2 id="example-title">A clean takeaway coffee cup set</h2>
+        <dl class="parts">
+          <div><dt>Plastic lid</dt><dd>Plastic <small>R08</small></dd></div>
+          <div><dt>Paper sleeve</dt><dd>Paper <small>R09</small></dd></div>
+          <div><dt>Clean paper cup</dt><dd>Beverage Cartons <small>R10</small></dd></div>
+        </dl>
+        <p class="cite">Source: <a href="https://www.wastereduction.hku.hk/photo-guide">HKU Photo Guide</a></p>
+      </aside>
+    </section>
+    <section class="dark" id="demo" aria-labelledby="demo-title">
+      <div class="wrap split">
+        <div>
+          <p class="context">Recorded walkthrough · 57 seconds</p>
+          <h2 id="demo-title">See HallSort in use</h2>
+          <p>The recording follows a cup through catalog mode, shows refusals for unsupported requests and finishes with a live model response.</p>
+          <a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/00eba9dcfd05441b596b5752d6102607466a9144/submission/hallsort-demo.mp4">Open the recording on GitHub</a>
+        </div>
+        <video controls playsinline preload="none" poster="demo-poster.jpg" aria-label="HallSort demonstration with narration and on-screen captions">
+          <source src="https://raw.githubusercontent.com/Isaiah-WU/ailt9019-hallsort/00eba9dcfd05441b596b5752d6102607466a9144/submission/hallsort-demo.mp4" type="video/mp4">
+          Your browser cannot play the embedded recording. Use the GitHub recording link.
+        </video>
+      </div>
+    </section>
+    <div class="wrap reading">
+      <section aria-labelledby="workflow-title">
+        <h2 id="workflow-title">How the result is produced</h2>
+        <p>Catalog mode checks the description against 17 entries that reference 16 recycling rules. It can return a separate category for each supported part. An unknown part causes the whole request to be refused.</p>
+        <p>In AI mode, eligible descriptions and the recycling rules are sent to a configured model. The server checks that each returned rule exists and matches its category, then attaches the official source. Local checks can refuse a request before any model call.</p>
+        <p>HallSort covers published re Kiosk guidance. The app cannot inspect contamination or verify which collection bins your hall has. Follow posted signs and staff instructions at the collection point.</p>
+        <a href="https://www.wastereduction.hku.hk/re-facilities">Find HKU collection facilities</a>
+      </section>
+      <section id="evaluation" aria-labelledby="eval-title">
+        <h2 id="eval-title">What we tested</h2>
+        <p>The October 25 records include 36 passing catalog cases. The first 32-case live run produced 30 passes and two unavailable responses. A later run passed all 32 cases. These were AI-authored regression examples, and refusal counts include local checks. Accuracy on unseen items remains unmeasured by these runs.</p>
+        <ul class="links">
+          <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/00eba9dcfd05441b596b5752d6102607466a9144/evidence/catalog_results.json">Catalog results</a></li>
+          <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/00eba9dcfd05441b596b5752d6102607466a9144/evidence/live_results.json">First live run</a></li>
+          <li><a href="https://github.com/Isaiah-WU/ailt9019-hallsort/blob/00eba9dcfd05441b596b5752d6102607466a9144/evidence/live_results_full_rerun.json">Full live rerun</a></li>
+        </ul>
+        <h3>Run it locally</h3>
+        <p>Catalog mode runs without an API key. The repository includes setup instructions and commands to reproduce the checks.</p>
+        <a href="https://github.com/Isaiah-WU/ailt9019-hallsort#readme">Open setup instructions</a>
+      </section>
+    </div>
+  </main>
+  <footer><div class="wrap">HallSort · AILT9019 student project · Group 12</div></footer>
+</body>
+</html>

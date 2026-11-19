@@ -5,21 +5,25 @@ An AILT9019 prototype that checks everyday items against a small, traceable cata
 ## Current state
 
 - Working local path: browser input → catalog lookup → rule/category validation → per-part results with official source links.
-- Optional AI path: sends the query and the complete rule file to an OpenAI-compatible Chat Completions API, then validates the returned structure, rule IDs and categories. The course-sponsored Alibaba Cloud Bailian `qwen3.8-flash` connection has been verified. See `evidence/live_results.json` for the complete serial acceptance run. Mocked transport tests remain separate from live evaluation.
+- Optional AI path: sends the query and the complete rule file to an OpenAI-compatible Chat Completions API, then validates the returned structure, rule IDs and categories. The course-sponsored Alibaba Cloud Bailian `qwen3.8-flash` connection has been verified. See `evidence/live_results.json` for the first serial acceptance run and `evidence/live_results_full_rerun.json` for the full suite after the rule-ID fix. Mocked transport tests remain separate from live evaluation.
 - Catalog mode does not call a model, simulate a model, or replay model answers. It only matches explicitly supported names. Unknown components cause refusal of the whole request.
 - This package was AI-generated on 25 October 2026. Team members must review it, run it themselves and describe their actual contributions honestly.
 
 ## Setup and run
 
-Use Python 3.12 (tested) and an internet connection to install dependencies. In this folder:
+Requires Python 3.12 or 3.13 and an internet connection to install dependencies. Tested on Windows with Python 3.12 and independently rerun on macOS with Python 3.12.13 and 3.13.12. In this folder:
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8019
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8019
 ```
 
-Open http://127.0.0.1:8019. On macOS/Linux, replace `.\.venv\Scripts\python.exe` with `.venv/bin/python`.
+On Windows PowerShell use `python` instead of `python3` and `.\.venv\Scripts\python.exe` instead of `.venv/bin/python`, or run `.\start.ps1`, which creates the environment on first use and then serves.
+
+`requirements.txt` pins the direct dependencies. `requirements-lock.txt` pins the full transitive set that produced the recorded results; use `-r requirements-lock.txt` instead of `requirements.txt` when exact versions matter.
+
+Open http://127.0.0.1:8019.
 
 Try `clean takeaway coffee cup set`. Expected three results, in order:
 
@@ -47,13 +51,15 @@ Reference: [OpenAI Chat Completions API](https://developers.openai.com/api/refer
 
 ## Verify
 
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-.\.venv\Scripts\python.exe -m pytest -q
-.\.venv\Scripts\python.exe evaluate.py
+```bash
+.venv/bin/python -m pip install -r requirements-dev.txt
+.venv/bin/python -m pytest -q
+.venv/bin/python evaluate.py
 ```
 
-`tests/cases.json` contains 36 expected-result regression cases fixed before the run. `evaluate.py` writes inputs, expected/actual outputs, timestamps and source hashes to `evidence/catalog_results.json`. These curated examples are not an independent accuracy benchmark. Unit/contract tests exercise invalid citations, category mismatch, request bounds, multipart limits, missing keys and mocked API failures. A mocked API test does not establish model accuracy or access.
+On Windows PowerShell, replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`. Expected output is `20 passed, 1 warning` and `Catalog regression: 36/36 passed.` The warning is a `StarletteDeprecationWarning` about `httpx` inside `starlette.testclient` and does not affect any result.
+
+`tests/cases.json` contains 36 expected-result regression cases fixed before the run. `evaluate.py` writes inputs, expected/actual outputs, timestamps and source hashes to `evidence/catalog_results.json`. These curated examples are not an independent accuracy benchmark. Unit/contract tests exercise invalid citations, category mismatch, request bounds, part-count limits, missing keys and mocked API failures. A mocked API test does not establish model accuracy or access.
 
 Before claiming the proposal's >=80% classification target or 100% refusal target for a real model, team members must create an independent 30–40-item evaluation set, write expected answers from sources before execution, run AI mode, check semantic rule support and retain complete failures as well as passes.
 
@@ -77,12 +83,22 @@ Known limits:
 
 ## Midterm handoff
 
-The course requires a <=60-second MP4, `repository_link.txt` and the one-page status sheet inside a ZIP <=100 MB. The video is deferred at the user's request. Repository: https://github.com/Isaiah-WU/ailt9019-hallsort (private). Course-team access still needs to be granted and verified. Uploading this source archive alone does not satisfy the submission requirement.
+The course requires a <=60-second MP4, `repository_link.txt` and the one-page status sheet inside a ZIP <=100 MB. A 57-second 1080p demo is included at `submission/hallsort-demo.mp4`. Repository: https://github.com/Isaiah-WU/ailt9019-hallsort (private). Course-team access still needs to be granted and verified. Uploading this source archive alone does not satisfy the submission requirement.
 
 The user reported no prior implementation work and subsequently supplied the group API credentials and setup information. No other member's completed contribution has been confirmed. Each member should complete a specific review, test, documentation or implementation task and record it accurately before finalizing the status sheet. No Moodle submission has been made.
 
-First live acceptance run: 30/32 (19/20 classification, 11/12 refusal). A subsequent narrow fix accepts unpadded IDs R1–R9 only when their canonical R01–R09 rule exists and the bin matches. Both failed cases passed a separate targeted rerun. The complete 32-case suite was not rerun after this change; both records and their source hashes are retained. Current unit tests: 20/20; catalog cases: 36/36.
+Live acceptance history, all with `qwen3.8-flash`:
+
+| Run | Time (HKT) | Result |
+|---|---|---|
+| First full suite | 25 Oct 00:52 | 30/32 (19/20 classification, 11/12 refusal) |
+| Targeted rerun of L17 and L32 | 25 Oct 00:58 | 2/2 |
+| Full suite after the rule-ID fix | 25 Oct 18:01 | 32/32 (20 classification, 12 refusal) |
+
+Both non-passes in the first run returned `unavailable` with no bin assignment, so they were missing verifiable answers rather than wrong classifications. L17 is explained by unpadded rule IDs; the fix now accepts R1–R9 only when the canonical R01–R09 rule exists and the bin matches. L32 is not explained by that fix: the refusal path never reads a rule ID, and its targeted rerun recorded a different model response. The 32/32 result is a single run of the same AI-authored suite at temperature 0, not independent validation, and it does not support an accuracy claim beyond what this section already says. Current unit tests: 20/20; catalog cases: 36/36; both independently rerun on macOS with identical source hashes. All three live records and their source hashes are retained.
+
+Screenshots of catalog mode and live AI mode are in `evidence/browser_coffee_set.png` and `evidence/browser_live_result.png`. The install and documentation check, including the environment it was run in, is in `evidence/install_reproduction_yang.md`.
 
 ## Live acceptance test
 
-Start the server with a provider key, then run `python evaluate_live.py --run`. This explicitly consumes quota, executes 32 cases serially with a one-second gap, and stops after two unavailable responses. Expectations were written before execution; this is an AI-authored acceptance suite and still requires independent team review. The reported refusals include local guard refusals and must not be described as a stand-alone model safety score. Read complete actual outputs and source hashes in `evidence/live_results.json`.
+Start the server with a provider key on `127.0.0.1:8019` (the script hardcodes that address), then run `.venv/bin/python evaluate_live.py --run`. This explicitly consumes quota, executes 32 cases serially with a one-second gap, and stops after two consecutive `unavailable` responses. If `HTTP_PROXY` is set in your shell, `httpx` proxies the localhost calls too and the script cannot connect; prefix the command with `NO_PROXY=127.0.0.1`. Expectations were written before execution; this is an AI-authored acceptance suite and still requires independent team review. The reported refusals include local guard refusals and must not be described as a stand-alone model safety score. Read complete actual outputs and source hashes in `evidence/live_results.json`.

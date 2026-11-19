@@ -318,7 +318,10 @@ if (photoInput) {
                 input.value = data.description.slice(0, 400);
                 input.dispatchEvent(new Event('input', {bubbles: true}));
                 input.focus();
-                setPhotoStatus('Check and edit the wording, then find the category. No bin is assigned from a photo.');
+                const unsure = /unclear|not sure|unknown|cannot tell/i.test(data.description);
+                setPhotoStatus(unsure
+                    ? 'The photo did not show whether it is clean. Add "clean" or "soiled", then find the category.'
+                    : 'Check and edit the wording, then find the category. No bin is assigned from a photo.');
             } else {
                 setPhotoStatus(data.message || 'That photo could not be described.');
             }

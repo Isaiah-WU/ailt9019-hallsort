@@ -1,5 +1,28 @@
 let providerName='the configured model provider';
 let latestCheckId = 0;
+let serverInfo = null;
+
+const KEY_STORE='hallsort.key', PROV_STORE='hallsort.provider';
+function loadKey(){
+  try{ return {provider: sessionStorage.getItem(PROV_STORE)||'openrouter', key: (sessionStorage.getItem(KEY_STORE)||'').trim()} }
+  catch(e){ return {provider:'openrouter', key:''} }
+}
+function authHeaders(){
+  const k=loadKey();
+  return k.key ? {'X-Provider':k.provider,'X-Provider-Key':k.key} : {};
+}
+function providerLabel(id){
+  const p = serverInfo && serverInfo.providers && serverInfo.providers.find(x=>x.id===id);
+  return p ? p.label : id;
+}
+function refreshModeLabel(){
+  if(!serverInfo) return;
+  const k=loadKey();
+  if(k.key){ mode.options[1].textContent='AI interpretation · your '+providerLabel(k.provider)+' key'; return }
+  mode.options[1].textContent = serverInfo.llm_available
+    ? 'AI interpretation · '+serverInfo.provider+' / '+serverInfo.model
+    : 'AI interpretation · add your own key, or use catalog';
+}
 const form=document.querySelector('#check-form'), input=document.querySelector('#item'), mode=document.querySelector('#mode'), results=document.querySelector('#results'), submit=document.querySelector('#submit');
 function el(tag,text,cls){const n=document.createElement(tag);n.textContent=text;if(cls)n.className=cls;return n}
 document.querySelectorAll('[data-query]').forEach(button => {
@@ -16,11 +39,10 @@ function updateModeNote() {
 }
 mode.addEventListener('change', updateModeNote);
 fetch('/api/info').then(response => response.json()).then(data => {
+    serverInfo = data;
     providerName = data.provider;
     document.querySelector('#version').textContent = 'Rules ' + data.rule_version;
-    mode.options[1].textContent = data.llm_available
-        ? 'AI interpretation · ' + data.provider + ' / ' + data.model
-        : 'AI interpretation · not configured yet';
+    refreshModeLabel();
     updateModeNote();
     data.examples.forEach(example => document.querySelector('#catalog').append(el('li', example)));
 }).catch(() => {
@@ -47,7 +69,7 @@ form.addEventListener('submit', async (e) => {
     try {
         const response = await fetch('/api/classify', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/json', ...authHeaders()},
             body: JSON.stringify({
                 query: query,
                 mode: searchMode
@@ -199,3 +221,143 @@ function updateInputFeedback() {
 }
 input.addEventListener('input', updateInputFeedback);
 updateInputFeedback();
+
+
+/* --- Photo to draft description, and optional bring-your-own-key --- */
+
+const photoInput = document.querySelector('#photo');
+const describeBtn = document.querySelector('#describe');
+const dropBtn = document.querySelector('#drop-photo');
+const photoStatus = document.querySelector('#photo-status');
+const preview = document.querySelector('#photo-preview');
+const keyPanel = document.querySelector('#key-panel');
+const keyProvider = document.querySelector('#key-provider');
+const keyValue = document.querySelector('#key-value');
+const keyClear = document.querySelector('#key-clear');
+
+let photo = null;
+
+function setPhotoStatus(text) {
+    photoStatus.textContent = text || '';
+}
+
+function shrink(file, max) {
+    max = max || 1024;
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => {
+            const scale = Math.min(1, max / Math.max(img.width, img.height));
+            const w = Math.max(1, Math.round(img.width * scale));
+            const h = Math.max(1, Math.round(img.height * scale));
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            URL.revokeObjectURL(url);
+            const data = canvas.toDataURL('image/jpeg', 0.85);
+            resolve({b64: data.split(',')[1], mime: 'image/jpeg'});
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error('Could not read that image.'));
+        };
+        img.src = url;
+    });
+}
+
+function resetPhoto() {
+    photo = null;
+    photoInput.value = '';
+    preview.hidden = true;
+    preview.removeAttribute('src');
+    describeBtn.disabled = true;
+    dropBtn.hidden = true;
+}
+
+if (photoInput) {
+    photoInput.addEventListener('change', async () => {
+        const file = photoInput.files && photoInput.files[0];
+        if (!file) return;
+        if (['image/jpeg', 'image/png', 'image/webp'].indexOf(file.type) === -1) {
+            setPhotoStatus('Use a JPEG, PNG or WebP image.');
+            resetPhoto();
+            return;
+        }
+        if (file.size > 12 * 1024 * 1024) {
+            setPhotoStatus('That image is larger than 12 MB. Use a smaller one.');
+            resetPhoto();
+            return;
+        }
+        try {
+            photo = await shrink(file);
+        } catch (error) {
+            setPhotoStatus(error.message);
+            resetPhoto();
+            return;
+        }
+        preview.src = 'data:' + photo.mime + ';base64,' + photo.b64;
+        preview.hidden = false;
+        describeBtn.disabled = false;
+        dropBtn.hidden = false;
+        setPhotoStatus('Photo ready. Describe it, then check the wording before you submit.');
+    });
+
+    describeBtn.addEventListener('click', async () => {
+        if (!photo) return;
+        describeBtn.disabled = true;
+        setPhotoStatus('Reading the photo…');
+        try {
+            const response = await fetch('/api/describe', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json', ...authHeaders()},
+                body: JSON.stringify({image: photo.b64, mime: photo.mime})
+            });
+            const data = await response.json();
+            if (data.status === 'described') {
+                input.value = data.description.slice(0, 400);
+                input.dispatchEvent(new Event('input', {bubbles: true}));
+                input.focus();
+                const unsure = /unclear|not sure|unknown|cannot tell/i.test(data.description);
+                setPhotoStatus(unsure
+                    ? 'The photo did not show whether it is clean. Add "clean" or "soiled", then find the category.'
+                    : 'Check and edit the wording, then find the category. No bin is assigned from a photo.');
+            } else {
+                setPhotoStatus(data.message || 'That photo could not be described.');
+            }
+        } catch (error) {
+            setPhotoStatus('Could not reach the server.');
+        } finally {
+            describeBtn.disabled = false;
+        }
+    });
+
+    dropBtn.addEventListener('click', () => {
+        resetPhoto();
+        setPhotoStatus('');
+    });
+}
+
+if (keyPanel) {
+    const saved = loadKey();
+    keyProvider.value = saved.provider;
+    keyValue.value = saved.key;
+    if (saved.key) keyPanel.open = true;
+
+    const persist = () => {
+        try {
+            sessionStorage.setItem(PROV_STORE, keyProvider.value);
+            sessionStorage.setItem(KEY_STORE, keyValue.value.trim());
+        } catch (error) { /* private mode, ignore */ }
+        refreshModeLabel();
+    };
+
+    keyValue.addEventListener('input', persist);
+    keyProvider.addEventListener('change', persist);
+    keyClear.addEventListener('click', () => {
+        keyValue.value = '';
+        try { sessionStorage.removeItem(KEY_STORE); } catch (error) {}
+        refreshModeLabel();
+        keyValue.focus();
+    });
+}
